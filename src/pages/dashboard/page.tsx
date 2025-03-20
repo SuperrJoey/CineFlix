@@ -5,7 +5,14 @@ const Dashboard = () => {
     const handleMoviesClick = () => {
         navigate('/movies')
     }
+    const handleSeatsClick = () => {
+        navigate('/seats')
+    }
 
+    const handleStaffClick = () => {
+        navigate('/staff')
+    }
+    
     return (
         <div className="min-h-screen bg-gray-100">
             <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-8">
@@ -21,15 +28,81 @@ const Dashboard = () => {
                         {/*Movies Managment*/}
                         <button 
                         onClick={handleMoviesClick}
-                        className="bg-blue-100 hover:bg-blue-200 p-4 rounded-lg
+                        className="bg-gray-800 hover:bg-gray-900 p-4 rounded-lg
                         shadow-md hover:shadow-xl transition-all duration-200 ease-in-out transform hover:scale-105">
                             <div className="flex items-center justify-center">
                                     <span>
                                         🎥
                                     </span>
                             </div>
-                            <p className="text-gray-900 mt-2">
+                            <p className="text-white mt-2">
                             Manages movie listings, showtimes, and screen
+                            </p>
+                        </button>
+
+                        <button 
+                        onClick={handleSeatsClick}
+                        className="bg-gray-800 hover:bg-gray-900 p-4 rounded-lg
+                        shadow-md hover:shadow-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                            <div className="flex items-center justify-center">
+                                    <span>
+                                        💺
+                                    </span>
+                            </div>
+                            <p className="text-white mt-2">
+                            Manages seat bookings.
+                            </p>
+                        </button>
+                        <button 
+                        onClick={handleStaffClick}
+                        className="bg-gray-800 hover:bg-gray-900 p-4 rounded-lg
+                        shadow-md hover:shadow-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                            <div className="flex items-center justify-center">
+                                    <span>
+                                        🤵
+                                    </span>
+                            </div>
+                            <p className="text-white mt-2">
+                            Manages staff, payroll, and their working hours..
+                            </p>
+                        </button>
+                        <button 
+                        onClick={handleStaffClick}
+                        className="bg-gray-800 hover:bg-gray-900 p-4 rounded-lg
+                        shadow-md hover:shadow-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                            <div className="flex items-center justify-center">
+                                    <span>
+                                        🧹
+                                    </span>
+                            </div>
+                            <p className="text-white mt-2">
+                            Manages maintanance schedules and records.
+                            </p>
+                        </button>
+                        <button 
+                        onClick={handleStaffClick}
+                        className="bg-gray-800 hover:bg-gray-900 p-4 rounded-lg
+                        shadow-md hover:shadow-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                            <div className="flex items-center justify-center">
+                                    <span>
+                                        👥
+                                    </span>
+                            </div>
+                            <p className="text-white mt-2">
+                            Manages customer details and their preferences.
+                            </p>
+                        </button>
+                        <button 
+                        onClick={handleStaffClick}
+                        className="bg-gray-800 hover:bg-gray-900 p-4 rounded-lg
+                        shadow-md hover:shadow-xl transition-all duration-200 ease-in-out transform hover:scale-105">
+                            <div className="flex items-center justify-center">
+                                    <span>
+                                        📃
+                                    </span>
+                            </div>
+                            <p className="text-white mt-2">
+                            Generates reports on revenue and trends
                             </p>
                         </button>
                     </div>  

@@ -1,7 +1,7 @@
-const movies = () => {
+const Movies = () => {
   return (
     <div>movies</div>
   )
 }
 
-export default movies
+export default Movies

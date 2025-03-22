@@ -1,7 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom'
+// src/App.tsx
+import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom'
 import './App.css'
 import Home from './pages/landing/page'
 import Dashboard from './pages/dashboard/page'
+import ClientDashboard from './pages/clientDashboard/page'
 import Movies from './pages/movies/page'
 import Seats from './pages/seats/page'
 import Staff from './pages/staff/page'
@@ -9,15 +11,33 @@ import Header from './components/Header'
 import Customer from './pages/customer/page'
 import Report from './pages/report/page'
 import Maintenance from './pages/maintenance/page'
+import { useEffect, useState } from 'react'
 
+// Protected route component
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRole: 'admin' | 'user' | null;
+}
+
+const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
+  const userRole = localStorage.getItem('user');
+  
+  if (!localStorage.getItem('token')) {
+    return <Navigate to="/" replace />;
+  }
+  
+  if (requiredRole && userRole !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
 
 const HeaderLayout = () => {
   return (
     <>
       <Header />
       <Outlet />
-
-    
     </>
   );
 }
@@ -26,26 +46,58 @@ const DefaultLayout = () => {
   return <Outlet />
 }
 
-
 function App() {
+  const [userRole, setUserRole] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const role = localStorage.getItem('user');
+    setUserRole(role);
+  }, []);
 
   return (
    <Router>
     <Routes>
       <Route element={<DefaultLayout/>}>
         <Route path="/" element={<Home/>} />
-        <Route path="/dashboard" element={<Dashboard/>} />
+        
+        {/* Admin Dashboard */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute requiredRole="admin">
+            <Dashboard/>
+          </ProtectedRoute>
+        } />
+        
+        {/* Client Dashboard */}
+        <Route path="/client-dashboard" element={
+          <ProtectedRoute requiredRole="user">
+            <ClientDashboard/>
+          </ProtectedRoute>
+        } />
       </Route>
 
       <Route element={<HeaderLayout/>}>
         <Route path="/movies" element={<Movies/>} />
         <Route path="/seats" element={<Seats/>} />
-        <Route path="/staff" element={<Staff/>} />
+        
+        {/* Admin-only routes */}
+        <Route path="/staff" element={
+          <ProtectedRoute requiredRole="admin">
+            <Staff/>
+          </ProtectedRoute>
+        } />
+        <Route path="/maintenance" element={
+          <ProtectedRoute requiredRole="admin">
+            <Maintenance/>
+          </ProtectedRoute>
+        } />
+        <Route path="/report" element={
+          <ProtectedRoute requiredRole="admin">
+            <Report/>
+          </ProtectedRoute>
+        } />
+        
         <Route path="/customer" element={<Customer/>} />
-        <Route path="/maintenance" element={<Maintenance/>} />
-        <Route path="/report" element={<Report/>} />
       </Route>
-
     </Routes>
    </Router>
   )

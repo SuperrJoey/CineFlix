@@ -51,6 +51,11 @@ function App() {
   
   useEffect(() => {
     const role = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+
+    console.log("from useEffect- ",localStorage.getItem('user'));
+    console.log("from useEffect - ", localStorage.getItem('token'));
+
     setUserRole(role);
   }, []);
 

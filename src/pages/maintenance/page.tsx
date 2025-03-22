@@ -1,6 +1,10 @@
 const Maintenance = () => {
   return (
-    <div>Maintenance</div>
+    <div>
+      <h1 className='text-4xl font-bold text-center'>
+      Maintenance
+        </h1>
+        </div>
   )
 }
 

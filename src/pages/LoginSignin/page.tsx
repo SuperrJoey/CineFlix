@@ -27,13 +27,15 @@ const LoginDialog = ({ onClose, navigate }: LoginDialogProps) => {
             const { username, password} = formData;
             const res = await axios.post("http://localhost:5000/api/auth/login", {
                 username, password});
+
+            console.log("Logging response", res.data);
             const { token, role } = res.data;
 
             localStorage.setItem("token", token);
             localStorage.setItem("user", role);
 
             // Route based on role
-            navigate(role === "admin" ? "/dashboard" : "/movies");
+            navigate(role === "admin" ? "/dashboard" : "/client-dashboard");
             onClose();
         } catch (error) {
             setError("Invalid username or password");

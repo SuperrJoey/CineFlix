@@ -44,7 +44,7 @@ const LoginDialog = ({ onClose, navigate }: LoginDialogProps) => {
         try {
             const {fullName, username, password} = formData;
             await axios.post("http://localhost:5000/api/auth/signup", {
-                fullName, username, password, role: "client"
+                fullName, username, password, role: "user"
             });
             alert("Signup successful! please login");
 

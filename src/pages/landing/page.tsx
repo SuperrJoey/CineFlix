@@ -1,35 +1,50 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LoginDialog from "../LoginSignin/page";
+import { ArrowRight } from "lucide-react";
+
 
 const Home = () => {
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
-    const [dialogOpen, setDialogOpen] = useState(false);
 
-    
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 text-white
-        flex flex-col items-center justify-center">
-            <div className="text-center">
-                <h1 className="text-5xl font-bold text-gray-800 mb-6">
-                    Welcome to the CineFlix!
-                </h1>
-                <p className="text-gray-600 px-4">
-                    Manage your theatre operations, scheduling, seat management and much more.
-                </p>
-                <button 
-                onClick={() => setDialogOpen(true)}
-                disabled={isLoading}
-                className="inline-flex items-center justify-center bg-gray-800
-                text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 
-                transition-colors shadow-lg hover:shadow-xl mt-6">
-                        Sign in
-                </button>
+        <div className="relative flex items-center justify-center h-screen bg-gradient-to-br
+        from-green-950 via-black to-black">
+            {/*Overlay for depth*/}
+            <div className="absolute inset-0 bg-gradient-to-r from-green-950/20 to-black/20 pointer-events-none">
             </div>
-            {dialogOpen && <LoginDialog onClose={() => setDialogOpen(false)} navigate={navigate}/>}
+            <div className="relative z-10 text-center px-4">
+                <h1 className="text-6xl font-bold mb-4 leading-tight bg-gradient-to-r from-white 
+                via-white to-green-400 text-transparent bg-clip-text">
+                    CineFlix,
+                    <br />
+                    Your Local Cinema!
+                </h1>
+
+                <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-4">
+                    Bringing Stories to Life, One Seat at a Time!
+                </p>
+
+                <div className="flex justify-center"> 
+                <button 
+                className="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-white 
+                hover:text-black transition duration-300 ease-in-out flex items-center justify-center group"
+                onClick={() => navigate("/signin")}
+                >
+                    <span className="flex items-center">
+                    Get started
+                    <ArrowRight 
+                        className="ml-2 transition-transform duration-300
+                        group-hover:translate-x-1 group-hover:scale-110"
+                        size={20}
+                    />
+
+                    </span>
+                </button>
+                </div>
+            </div>
         </div>
     )
+
 }
 
 export default Home;

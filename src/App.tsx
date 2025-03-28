@@ -12,6 +12,9 @@ import Customer from './pages/customer/page'
 import Report from './pages/report/page'
 import Maintenance from './pages/maintenance/page'
 import { useEffect, useState } from 'react'
+import Signin from './pages/auth/Login'
+import Register from './pages/auth/Register'
+import AuthLayout from './pages/authLayout/page'
 
 // Protected route component
 interface ProtectedRouteProps {
@@ -64,6 +67,15 @@ function App() {
     <Routes>
       <Route element={<DefaultLayout/>}>
         <Route path="/" element={<Home/>} />
+      </Route>
+
+    <Route element={<AuthLayout/>}>
+      <Route path='/signin' element={<Signin/>}/>
+      <Route path='/register' element={<Register/>}/>
+
+    </Route>
+
+
         
         {/* Admin Dashboard */}
         <Route path="/dashboard" element={
@@ -78,7 +90,6 @@ function App() {
             <ClientDashboard/>
           </ProtectedRoute>
         } />
-      </Route>
 
       <Route element={<HeaderLayout/>}>
         <Route path="/movies" element={<Movies/>} />

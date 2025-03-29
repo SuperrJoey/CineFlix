@@ -1,4 +1,3 @@
-// src/App.tsx
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom'
 import './App.css'
 import Home from './pages/landing/page'
@@ -65,18 +64,19 @@ function App() {
   return (
    <Router>
     <Routes>
+      {/* Public routes without header */}
       <Route element={<DefaultLayout/>}>
         <Route path="/" element={<Home/>} />
       </Route>
 
-    <Route element={<AuthLayout/>}>
-      <Route path='/signin' element={<Signin/>}/>
-      <Route path='/register' element={<Register/>}/>
+      {/* Auth routes */}
+      <Route element={<AuthLayout/>}>
+        <Route path='/signin' element={<Signin/>}/>
+        <Route path='/register' element={<Register/>}/>
+      </Route>
 
-    </Route>
-
-
-        
+      {/* All routes that need header */}
+      <Route element={<HeaderLayout/>}>
         {/* Admin Dashboard */}
         <Route path="/dashboard" element={
           <ProtectedRoute requiredRole="admin">
@@ -91,7 +91,6 @@ function App() {
           </ProtectedRoute>
         } />
 
-      <Route element={<HeaderLayout/>}>
         <Route path="/movies" element={<Movies/>} />
         <Route path="/seats" element={<Seats/>} />
         

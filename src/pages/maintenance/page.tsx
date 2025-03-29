@@ -1,7 +1,8 @@
 const Maintenance = () => {
   return (
-    <div>
-      <h1 className='text-4xl font-bold text-center'>
+    <div className="min-h-screen bg-gradient-to-br
+        from-green-950 via-black to-black">
+      <h1 className='py-10 text-4xl font-bold text-center'>
       Maintenance
         </h1>
         </div>

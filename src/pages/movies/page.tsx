@@ -32,24 +32,25 @@ const Movies = () => {
   }
 
   return (
-    <div className="p-5">
+    <div className="p-20 min-h-screen bg-gradient-to-br
+        from-green-950 via-black to-black">
       <h2 className="text-2xl font-bold mb-4">Movies</h2>
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border border-gray-300 px-4 py-2">Name</th>
-            <th className="border border-gray-300 px-4 py-2">Duration (min)</th>
-            <th className="border border-gray-300 px-4 py-2">Genre</th>
-            <th className="border border-gray-300 px-4 py-2">Rating</th>
+            <th className="border border-gray-300 px-4 py-2 text-white">Name</th>
+            <th className="border border-gray-300 px-4 py-2 text-white">Duration (min)</th>
+            <th className="border border-gray-300 px-4 py-2 text-white">Genre</th>
+            <th className="border border-gray-300 px-4 py-2 text-white">Rating</th>
           </tr>
         </thead>
         <tbody>
           {movies.map((movie) => (
             <tr key={movie.id} className="hover:bg-gray-100">
-              <td className="border border-gray-300 px-4 py-2">{movie.name}</td>
-              <td className="border border-gray-300 px-4 py-2">{movie.duration} min</td>
-              <td className="border border-gray-300 px-4 py-2">{movie.genre}</td>
-              <td className="border border-gray-300 px-4 py-2">{movie.rating}/10</td>
+              <td className="border border-gray-300 px-4 py-2 text-white">{movie.name}</td>
+              <td className="border border-gray-300 px-4 py-2 text-white">{movie.duration} min</td>
+              <td className="border border-gray-300 px-4 py-2 text-white">{movie.genre}</td>
+              <td className="border border-gray-300 px-4 py-2 text-white">{movie.rating}/10</td>
             </tr>
           ))}
         </tbody>

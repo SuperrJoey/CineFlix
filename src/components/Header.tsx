@@ -6,13 +6,22 @@ const Header = () => {
     const userRole = localStorage.getItem('user');
     
     const isActive = (path: string) => location.pathname === path;
+
+    const handleNavigate = () => {
+        if(userRole === 'admin') {
+            navigate("/dashboard")
+        }
+        else {
+            navigate("/client-dashboard")
+        }
+    }
     
     return (
         <header className="py-4 px-6 bg-transparent absolute w-full">
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo on left */}
                 <button 
-                    onClick={() =>   navigate('/dashboard')}
+                    onClick={handleNavigate}
                     className="text-white text-xl font-extrabold"
                 >
                     CineFlix

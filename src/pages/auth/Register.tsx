@@ -9,29 +9,37 @@ const Register = () => {
   const [formData, setFormData] = useState({ 
     fullName: "", 
     username: "", 
-    password: "" 
+    password: "",
+    role: "" 
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { fullName, username, password } = formData;
+      const { fullName, username, password, role } = formData;
       
-      await axios.post("http://localhost:5000/api/auth/signup", {
-        fullName,
-        username, // Using email as username
+      const response = await axios.post("http://localhost:5000/api/auth/signup", {
+        name: fullName,
+        username,
         password,
-        role: "user"
+        role
       });
-      navigate("/client-dashboard");
-    } catch (error) {
-      setError("Signup failed. Please try again.");
+
+      // Store user role for future use
+      localStorage.setItem("user", role);
+      
+      // Navigate based on role
+      navigate(role === "admin" ? "/dashboard" : "/client-dashboard");
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Signup failed. Please try again.");
     }
   };
 
@@ -51,6 +59,24 @@ const Register = () => {
             onChange={handleInputChange}
             required
           />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Role <span className="text-red-500">*</span>
+          </label>
+          <select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
+          >
+            <option value="">Select a role</option>
+            <option value="user">Client</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
 
         <div className="mb-4">

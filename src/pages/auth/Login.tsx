@@ -25,9 +25,10 @@ const Login = () => {
         password
       });
 
-      const { token, role } = res.data;
+      const { token, role, name } = res.data;
       localStorage.setItem("token", token);
       localStorage.setItem("user", role);
+      localStorage.setItem("Name", name);
 
       // Route based on role
       navigate(role === "admin" ? "/dashboard" : "/client-dashboard");

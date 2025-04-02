@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Key } from "lucide-react";
+import { ChevronLeft, ChevronRight, Grab, Key } from "lucide-react";
 
 interface Movie {
-    MovieId: number;
+    MovieID: number;
     Title: string;
     Duration: number;
     Genre: string;
@@ -27,6 +27,7 @@ export const Movies = () => {
         const fetchMovies = async () => {
             try {
                 const response = await axios.get("http://localhost:5000/api/movies");
+                console.log("Fetched movies:", response.data);
                 setMovies(response.data);
             } catch (error) {
                 console.error("Error fetching movies:", error);
@@ -35,6 +36,10 @@ export const Movies = () => {
         };
         fetchMovies();
     }, [])
+
+    useEffect(() => {
+        console.log("Current movies state:", movies);
+    }, [movies]);
 
     useEffect(() => {
         if (movies.length > 0) {
@@ -83,6 +88,9 @@ export const Movies = () => {
         )
     }
     
+    {genreGroups.map((group) => (
+        console.log("group -> ", group)
+    ))}
 
     return (
         <div className="min-h-screen bg-gradient-to-br
@@ -117,8 +125,8 @@ export const Movies = () => {
                     >
                         {group.movies.map(movie => (
                             <Link 
-                                key={`${group.genre}-${movie.MovieId}`}
-                                to={`/${movie.MovieId}`}
+                                key={`${group.genre}-${movie.MovieID}`}
+                                to={`/movies/${movie.MovieID}`}
                                 className="flex-shrink-0 w-48 group relative bg-transparent border-[#6A7077]
                                 border rounded-[15px] p-3 mt-3 shadow-lg transform transition hover:scale-105 hover:shadow-xl"
                             >

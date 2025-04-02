@@ -4,6 +4,7 @@ import Home from './pages/landing/page'
 import Dashboard from './pages/dashboard/page'
 import ClientDashboard from './pages/clientDashboard/page'
 import { Movies } from './pages/movies/page'
+import MovieDetails from './pages/movies/movieDetails'
 import Seats from './pages/seats/page'
 import Staff from './pages/staff/page'
 import Header from './components/Header'
@@ -92,6 +93,7 @@ function App() {
         } />
 
         <Route path="/movies" element={<Movies/>} />
+        <Route path="/movies/:id" element={<MovieDetails/>} />
         <Route path="/seats" element={<Seats/>} />
         
         {/* Admin-only routes */}

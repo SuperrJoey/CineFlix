@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Grab, Key } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { AddMovieDialog } from "../../components/AddMovieDialog";
 
 interface Movie {
     MovieID: number;
@@ -21,6 +22,8 @@ export const Movies = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
     const [loading, setLoading] = useState(true);
     const [genreGroups, setgenreGroups] = useState<GenreGroup[]>([]);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isAddMovieOpen, setIsAddMovieOpen] = useState(false);
     const rowRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
 
     useEffect(() => {
@@ -36,6 +39,15 @@ export const Movies = () => {
         };
         fetchMovies();
     }, [])
+
+    useEffect(() => {
+        // Check if user is admin
+        const token = localStorage.getItem('token');
+        if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            setIsAdmin(payload.role === 'admin');
+        }
+    }, []);
 
     useEffect(() => {
         console.log("Current movies state:", movies);
@@ -79,7 +91,11 @@ export const Movies = () => {
         }
     };
 
-    console.log(movies);
+    const handleAddMovieSuccess = () => {
+        // Refresh movies list
+        window.location.reload();
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-green-950 via-black to-black flex items-center justify-center">
@@ -88,78 +104,88 @@ export const Movies = () => {
         )
     }
     
-    {genreGroups.map((group) => (
-        console.log("group -> ", group)
-    ))}
-
     return (
-        <div className="min-h-screen bg-gradient-to-br
-        from-green-950 via-black to-black">
+        <div className="min-h-screen bg-gradient-to-br from-green-950 via-black to-black">
             <div className="absolute inset-0 bg-gradient-to-r from-green-950/20 to-black/20 pointer-events-none">
             </div>
-        <div className="container mx-auto p-4 py-20 ">
-            <h1 className="text-3xl font-bold text-white text-center mb-8">
-                Explore Movies
-            </h1>
-
-            {genreGroups.map((group) => (
-                <div key={group.genre} className="mb-18">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-2xl font-semibold text-white">
-                            {group.genre}
-                        </h2>
-                    </div>
-                    <div className="relative">
-                        {group.movies.length > 5 && (
-                    <button 
-                     onClick={() => scrollRow('left', group.genre)}
-                    className="bg-gray-700 opacity-80 hover:bg-gray-800 absolute left-0 top-1/2 -translate-y-1/2 z-10 text-white p-2 rounded-full"
-                    >
-                        <ChevronLeft size={30}/>
-                    </button>
-                        )}
-                    <div
-                        ref={(el) => { rowRefs.current[group.genre] = el }}
-                        className="flex overflow-x-auto pb-4 hide-scrollbar space-x-4 relative"
-                        style={{ scrollbarWidth: 'none' }}
-                    >
-                        {group.movies.map(movie => (
-                            <Link 
-                                key={`${group.genre}-${movie.MovieID}`}
-                                to={`/movies/${movie.MovieID}`}
-                                className="flex-shrink-0 w-48 group relative bg-transparent border-[#6A7077]
-                                border rounded-[15px] p-3 mt-3 shadow-lg transform transition hover:scale-105 hover:shadow-xl"
-                            >
-                                <div>
-                                    <img src={movie.poster_url}
-                                        alt={movie.Title}
-                                        className="w-full h-full object-cover rounded-lg group-hover:opacity-80 transition" 
-                                    />
-                                    <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg
-                                    opacity-0 group-hover:opacity-100 transition"></div>
-                                </div>
-                                <h3 className="text-lg font-semibold text-white mt-2 truncate">
-                                    {movie.Title}
-                                </h3>
-                                <p className="text-gray-400 mt-2 text-sm">{movie.Duration}mins</p>
-                            </Link>
-                        ))}
-                       </div>
-                       {group.movies.length > 5 && (
-                         <button
-                                className="bg-gray-700 opacity-80 hover:bg-gray-800 absolute text-white p-2 rounded-full right-0 top-1/2 trasnform -translate-y-1/2 z-10"
-                                onClick={() => scrollRow('right', group.genre)}
-                            >
-                                <ChevronRight size={30}/>                                
-                            </button>
-                       )}
-                    </div>
+            <div className="container mx-auto p-4 py-20">
+                <div className="flex justify-between items-center mb-8 relative">
+                    <div className="w-24"></div>
+                    <h1 className="text-3xl font-bold text-white absolute left-1/2 -translate-x-1/2">
+                        Explore Movies
+                    </h1>
+                    {isAdmin && (
+                        <button
+                            onClick={() => setIsAddMovieOpen(true)}
+                            className="text-white px-6 py-2 hover:text-white hover:bg-green-800 transition-all rounded-2xl border border-white-400 flex items-center gap-2"
+                        >
+                            <Plus size={20} />
+                            Add Movie
+                        </button>
+                    )}
                 </div>
-            ))}
 
+                {genreGroups.map((group) => (
+                    <div key={group.genre} className="mb-18">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-2xl font-semibold text-white">
+                                {group.genre}
+                            </h2>
+                        </div>
+                        <div className="relative">
+                            {group.movies.length > 5 && (
+                                <button 
+                                    onClick={() => scrollRow('left', group.genre)}
+                                    className="bg-gray-700 opacity-80 hover:bg-gray-800 absolute left-0 top-1/2 -translate-y-1/2 z-10 text-white p-2 rounded-full"
+                                >
+                                    <ChevronLeft size={30}/>
+                                </button>
+                            )}
+                            <div
+                                ref={(el) => { rowRefs.current[group.genre] = el }}
+                                className="flex overflow-x-auto pb-4 hide-scrollbar space-x-4 relative"
+                                style={{ scrollbarWidth: 'none' }}
+                            >
+                                {group.movies.map(movie => (
+                                    <Link 
+                                        key={`${group.genre}-${movie.MovieID}`}
+                                        to={`/movies/${movie.MovieID}`}
+                                        className="flex-shrink-0 w-48 group relative bg-transparent border-[#6A7077]
+                                        border rounded-[15px] p-3 mt-3 shadow-lg transform transition hover:scale-105 hover:shadow-xl"
+                                    >
+                                        <div>
+                                            <img src={movie.poster_url}
+                                                alt={movie.Title}
+                                                className="w-full h-full object-cover rounded-lg group-hover:opacity-80 transition" 
+                                            />
+                                            <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg
+                                            opacity-0 group-hover:opacity-100 transition"></div>
+                                        </div>
+                                        <h3 className="text-lg font-semibold text-white mt-2 truncate">
+                                            {movie.Title}
+                                        </h3>
+                                        <p className="text-gray-400 mt-2 text-sm">{movie.Duration}mins</p>
+                                    </Link>
+                                ))}
+                            </div>
+                            {group.movies.length > 5 && (
+                                <button
+                                    className="bg-gray-700 opacity-80 hover:bg-gray-800 absolute text-white p-2 rounded-full right-0 top-1/2 trasnform -translate-y-1/2 z-10"
+                                    onClick={() => scrollRow('right', group.genre)}
+                                >
+                                    <ChevronRight size={30}/>                                
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                ))}
 
+                <AddMovieDialog
+                    isOpen={isAddMovieOpen}
+                    onClose={() => setIsAddMovieOpen(false)}
+                    onSuccess={handleAddMovieSuccess}
+                />
             </div>
         </div>
     )
-    
 }

@@ -1,6 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { format, addDays, isAfter, isBefore, parseISO } from 'date-fns';
 
 interface Movie {
   Title: string;
@@ -17,7 +18,6 @@ interface Showtime {
   MovieID: number;
   screenID: number;
   StartTime: string;
-  EndTime: string;
   Title: string;
   Genre: string;
   Duration: number;
@@ -29,16 +29,41 @@ interface Showtime {
   }[];
 }
 
+interface AddShowtimeForm {
+  screenId: string;
+  startTime: string;
+  totalSeats: string;
+}
+
 export const MovieDetails = () => {
   const { id } = useParams<{id: string}>();
+  const navigate = useNavigate();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [showtimes, setShowtimes] = useState<Showtime []>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showContent, setShowContent] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [formData, setFormData] = useState<AddShowtimeForm>({
+    screenId: '',
+    startTime: '',
+    totalSeats: '50'
+  });
+  const [addingShowtime, setAddingShowtime] = useState(false);
 
+  // Generate available screens (1-20)
+  const availableScreens = Array.from({ length: 20 }, (_, i) => i + 1);
+
+  // Generate available dates (next 5 days)
+  const availableDates = Array.from({ length: 5 }, (_, i) => addDays(new Date(), i + 1));
 
   useEffect(() => {
+    const checkAdminStatus = () => {
+      const userRole = localStorage.getItem('user');
+      setIsAdmin(userRole === 'admin');
+    };
+
     const fetchMovieAndShowtimes = async () => {
       try {
         setLoading(true);
@@ -57,9 +82,73 @@ export const MovieDetails = () => {
         const timer = setTimeout(() => setShowContent(true), 500);
       }
     };
-    fetchMovieAndShowtimes();
 
-  }, [id])
+    checkAdminStatus();
+    fetchMovieAndShowtimes();
+  }, [id]);
+
+  const handleAddShowtime = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      setAddingShowtime(true);
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Please login as admin');
+        return;
+      }
+
+      // Validate time range
+      const startDate = parseISO(formData.startTime);
+      const now = new Date();
+      const maxDate = addDays(now, 5);
+
+      if (isBefore(startDate, now) || isAfter(startDate, maxDate)) {
+        alert('Start time must be within the next 5 days');
+        return;
+      }
+
+      // Ensure all required fields are present and properly typed
+      if (!formData.screenId || !formData.startTime || !formData.totalSeats) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      const response = await axios.post(
+        'http://localhost:5000/api/showtimes',
+        {
+          movieId: parseInt(id || '0'),
+          screenId: parseInt(formData.screenId),
+          startTime: formData.startTime,
+          totalSeats: parseInt(formData.totalSeats)
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data) {
+        // Refresh showtimes
+        const showtimeRes = await axios.get(`http://localhost:5000/api/showtimes/movie/${id}`);
+        setShowtimes(showtimeRes.data);
+        setShowAddForm(false);
+        setFormData({
+          screenId: '',
+          startTime: '',
+          totalSeats: '50'
+        });
+      }
+    } catch (error: any) {
+      console.error('Error adding showtime:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to add showtime. Please try again.';
+      alert(errorMessage);
+    } finally {
+      setAddingShowtime(false);
+    }
+  };
 
   const getBookingStatus = (showtime: Showtime) => {
     if (!showtime.seats) return { available: false, trending: false };
@@ -174,7 +263,90 @@ export const MovieDetails = () => {
             </div>
 
             <div className="bg-black/40 p-4 rounded-lg backdrop-blur-sm">
-              <h2 className="text-lg font-semibold text-white mb-4">Showtimes</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-white">Showtimes</h2>
+                {isAdmin && !showAddForm && (
+                  <button
+                    onClick={() => setShowAddForm(true)}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    Add Showtime
+                  </button>
+                )}
+              </div>
+
+              {showAddForm && isAdmin && (
+                <form onSubmit={handleAddShowtime} className="bg-white/5 p-4 rounded-lg mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-white text-sm font-medium mb-2">
+                        Screen
+                      </label>
+                      <select
+                        value={formData.screenId}
+                        onChange={(e) => setFormData(prev => ({ ...prev, screenId: e.target.value }))}
+                        className="w-full bg-white/10 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
+                      >
+                        <option value="">Select Screen</option>
+                        {availableScreens.map(screen => (
+                          <option key={screen} value={screen}>
+                            Screen {screen}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-white text-sm font-medium mb-2">
+                        Total Seats
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={formData.totalSeats}
+                        onChange={(e) => setFormData(prev => ({ ...prev, totalSeats: e.target.value }))}
+                        className="w-full bg-white/10 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-white text-sm font-medium mb-2">
+                        Start Time
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={formData.startTime}
+                        onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+                        min={new Date().toISOString().slice(0, 16)}
+                        max={addDays(new Date(), 5).toISOString().slice(0, 16)}
+                        className="w-full bg-white/10 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-4 mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddForm(false)}
+                      className="px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={addingShowtime}
+                      className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-800 disabled:cursor-not-allowed"
+                    >
+                      {addingShowtime ? 'Adding...' : 'Add Showtime'}
+                    </button>
+                  </div>
+                </form>
+              )}
+
               {hasShowtimes ? (
                 <div className="space-y-3">
                   {showtimes.map((showtime) => {
@@ -202,6 +374,7 @@ export const MovieDetails = () => {
                                 ? 'bg-green-600 hover:bg-green-700 text-white' 
                                 : 'bg-gray-600 text-gray-300 cursor-not-allowed'}`}
                             disabled={!available}
+                            onClick={() => available && navigate(`/booking/${showtime.screenID}/${showtime.ShowtimeID}`)}
                           >
                             {available ? 'Book Now' : 'Sold Out'}
                           </button>
@@ -213,7 +386,11 @@ export const MovieDetails = () => {
               ) : (
                 <div className="text-center py-8">
                   <p className="text-gray-400">No showtimes available at the moment</p>
-                  <p className="text-gray-500 text-sm mt-2">Please check back later for updates</p>
+                  {isAdmin ? (
+                    <p className="text-gray-500 text-sm mt-2">Add a showtime using the button above</p>
+                  ) : (
+                    <p className="text-gray-500 text-sm mt-2">Please check back later for updates</p>
+                  )}
                 </div>
               )}
             </div>

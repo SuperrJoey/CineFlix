@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react'
 import Signin from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import AuthLayout from './pages/authLayout/page'
+import BookingPage from './pages/BookingPage'
 
 // Protected route component
 interface ProtectedRouteProps {
@@ -95,6 +96,11 @@ function App() {
         <Route path="/movies" element={<Movies/>} />
         <Route path="/movies/:id" element={<MovieDetails/>} />
         <Route path="/seats" element={<Seats/>} />
+        <Route path="/booking/:screenId/:showtimeId" element={
+          <ProtectedRoute requiredRole="user">
+            <BookingPage/>
+          </ProtectedRoute>
+        } />
         
         {/* Admin-only routes */}
         <Route path="/staff" element={

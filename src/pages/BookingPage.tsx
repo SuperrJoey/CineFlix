@@ -11,6 +11,7 @@ interface Seat {
   ShowtimeID: number;
   AvailabilityStatus: string;
   BookingID: number | null;
+  Duration: number;
 }
 
 interface Showtime {
@@ -40,7 +41,8 @@ const BookingPage = () => {
     showtimeDate: '',
     showtimeTime: '',
     screen: 0,
-    seatNumbers: []
+    seatNumbers: [],
+    duration: 0
   });
   const MAX_SEATS_PER_BOOKING = 4;
 
@@ -164,11 +166,12 @@ const BookingPage = () => {
       if (response.status === 201) {
         setBookingDetails({
           movieName: response.data.movieName,
-          poster: response.data.poster,
+          poster: response.data.poster_url,
           showtimeDate: response.data.showtimeDate,
           showtimeTime: response.data.showtimeTime,
           screen: response.data.screen,
-          seatNumbers: response.data.seatNumbers
+          seatNumbers: response.data.seatIds,
+          duration: response.data.Duration
         });
         setIsModalOpen(true);
       } else {

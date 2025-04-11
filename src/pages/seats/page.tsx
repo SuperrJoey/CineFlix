@@ -35,11 +35,16 @@ const Seats = () => {
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   // Generate 7 days starting from today
   const dates = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i));
 
   useEffect(() => {
+    // Get user role
+    const role = localStorage.getItem('user');
+    setUserRole(role);
+
     const fetchMoviesAndShowtimes = async () => {
       try {
         setLoading(true);
@@ -83,7 +88,13 @@ const Seats = () => {
 
   const handleShowtimeClick = (screenId: number, showtimeId: number) => {
     console.log("Showtime clicked:", { screenId, showtimeId });
-    navigate(`/booking/${screenId}/${showtimeId}`);
+    
+    // Route based on user role
+    if (userRole === 'admin') {
+      navigate(`/admin/booking/${screenId}/${showtimeId}`);
+    } else {
+      navigate(`/booking/${screenId}/${showtimeId}`);
+    }
   };
 
   if (loading) {
@@ -109,6 +120,13 @@ const Seats = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-950 via-black to-black py-20">
       <div className="container mx-auto px-4">
+        {/* User Role Indicator for Admin */}
+        {userRole === 'admin' && (
+          <div className="bg-yellow-500/20 text-yellow-300 text-center py-2 px-4 rounded-lg mb-6">
+            Admin View - You will see seat occupancy details when clicking a showtime
+          </div>
+        )}
+        
         {/* Date Selection */}
         <div className="flex gap-2 overflow-x-auto pb-4 mb-8">
           {dates.map((date) => (
@@ -154,7 +172,12 @@ const Seats = () => {
                     <button
                       key={showtime.ShowtimeID}
                       onClick={() => handleShowtimeClick(showtime.screenID, showtime.ShowtimeID)}
-                      className="bg-white/10 hover:bg-white/20 text-white rounded-lg p-4 transition-colors"
+                      className={`
+                        rounded-lg p-4 transition-colors
+                        ${userRole === 'admin' 
+                          ? 'bg-yellow-500/20 hover:bg-yellow-500/40 text-white' 
+                          : 'bg-white/10 hover:bg-white/20 text-white'}
+                      `}
                     >
                       <div className="text-lg font-semibold">
                         {format(new Date(showtime.StartTime), 'hh:mm a')}
@@ -162,6 +185,11 @@ const Seats = () => {
                       <div className="text-sm text-gray-400 mt-1">
                         Screen {showtime.screenID}
                       </div>
+                      {userRole === 'admin' && (
+                        <div className="text-xs text-yellow-300 mt-1">
+                          View Occupancy
+                        </div>
+                      )}
                     </button>
                   ))}
               </div>

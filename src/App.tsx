@@ -16,6 +16,7 @@ import Signin from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import AuthLayout from './pages/authLayout/page'
 import BookingPage from './pages/BookingPage'
+import AdminBookingView from './pages/adminBookingView'
 
 // Protected route component
 interface ProtectedRouteProps {
@@ -96,9 +97,18 @@ function App() {
         <Route path="/movies" element={<Movies/>} />
         <Route path="/movies/:id" element={<MovieDetails/>} />
         <Route path="/seats" element={<Seats/>} />
+        
+        {/* User booking route */}
         <Route path="/booking/:screenId/:showtimeId" element={
           <ProtectedRoute requiredRole="user">
             <BookingPage/>
+          </ProtectedRoute>
+        } />
+        
+        {/* Admin booking view route */}
+        <Route path="/admin/booking/:screenId/:showtimeId" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminBookingView/>
           </ProtectedRoute>
         } />
         

@@ -82,6 +82,7 @@ const Seats = () => {
   });
 
   const handleShowtimeClick = (screenId: number, showtimeId: number) => {
+    console.log("Showtime clicked:", { screenId, showtimeId });
     navigate(`/booking/${screenId}/${showtimeId}`);
   };
 

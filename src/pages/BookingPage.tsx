@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MdEventSeat } from 'react-icons/md';
 import axios from 'axios';
+import BookingModal from '../components/BookingModal';
 
 interface Seat {
   SeatID: number;
@@ -32,6 +33,15 @@ const BookingPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState({
+    movieName: '',
+    poster: '',
+    showtimeDate: '',
+    showtimeTime: '',
+    screen: 0,
+    seatNumbers: []
+  });
   const MAX_SEATS_PER_BOOKING = 4;
 
   useEffect(() => {
@@ -149,9 +159,18 @@ const BookingPage = () => {
         }
       );
 
-      if (response.data.success) {
-        alert('Booking successful!');
-        navigate('/client-dashboard');
+      console.log("Booking response: ", response.data);
+
+      if (response.status === 201) {
+        setBookingDetails({
+          movieName: response.data.movieName,
+          poster: response.data.poster,
+          showtimeDate: response.data.showtimeDate,
+          showtimeTime: response.data.showtimeTime,
+          screen: response.data.screen,
+          seatNumbers: response.data.seatNumbers
+        });
+        setIsModalOpen(true);
       } else {
         alert('Booking failed. Please try again.');
       }
@@ -262,6 +281,7 @@ const BookingPage = () => {
           </div>
         </div>
       </div>
+      <BookingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} bookingDetails={bookingDetails} />
     </div>
   );
 };

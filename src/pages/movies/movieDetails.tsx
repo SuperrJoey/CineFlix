@@ -284,18 +284,21 @@ export const MovieDetails = () => {
                         Screen
                       </label>
                       <select
-                        value={formData.screenId}
-                        onChange={(e) => setFormData(prev => ({ ...prev, screenId: e.target.value }))}
-                        className="w-full bg-white/10 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        required
-                      >
-                        <option value="">Select Screen</option>
-                        {availableScreens.map(screen => (
-                          <option key={screen} value={screen}>
-                            Screen {screen}
+                          value={formData.screenId}
+                          onChange={(e) => setFormData(prev => ({ ...prev, screenId: e.target.value }))}
+                          className="w-full bg-black text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none"
+                          required
+                        >
+                          <option value="" className="bg-black text-white">
+                            Select Screen
                           </option>
-                        ))}
-                      </select>
+                          {availableScreens.map(screen => (
+                            <option key={screen} value={screen} className="bg-black text-white">
+                              Screen {screen}
+                            </option>
+                          ))}
+                        </select>
+
                     </div>
 
                     <div>

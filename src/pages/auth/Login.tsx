@@ -96,12 +96,6 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="mb-6 text-right">
-          <a href="#" className="text-sm text-green-600 hover:underline">
-            I forgot my password?
-          </a>
-        </div>
-
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
             {error}

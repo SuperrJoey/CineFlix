@@ -112,6 +112,18 @@ const BookingPage = () => {
     fetchShowtimeAndSeats();
   }, [screenId, showtimeId, navigate]);
 
+  const refreshSeats = async () => {
+    if (showtime) {
+      try {
+        const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${showtime.ShowtimeID}`);
+        setSeats(seatsResponse.data);
+        setSelectedSeats([]); // Clear selection after booking
+      } catch (error) {
+        console.error("Failed to refresh seats", error);
+      }
+    }
+  };
+  
   const handleSeatClick = (seatId: number) => {
     if (!isAuthenticated) {
       navigate('/signin');
@@ -284,9 +296,13 @@ const BookingPage = () => {
           </div>
         </div>
       </div>
-      <BookingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} bookingDetails={bookingDetails} />
-    </div>
-  );
-};
+      <BookingModal isOpen={isModalOpen} onClose={() => {
+            setIsModalOpen(false);
+            refreshSeats(); // Refresh seat data
+          }}
+          bookingDetails={bookingDetails} />
+              </div>
+            );
+          };
 
 export default BookingPage; 

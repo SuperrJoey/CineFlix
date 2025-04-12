@@ -10,7 +10,7 @@ const Register = () => {
     fullName: "", 
     username: "", 
     password: "",
-    role: "" 
+    role: "user" 
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -61,7 +61,7 @@ const Register = () => {
           />
         </div>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Role <span className="text-red-500">*</span>
           </label>
@@ -78,24 +78,7 @@ const Register = () => {
             <option value="admin">Admin</option>
           </select>
 
-    {formData.role === 'admin' && (
-      <div className="my-3">
-        <label 
-        htmlFor="adminRole"
-        className="block text-sm font-medium text-gray-700 mb-1"
-        >Admin Role <span className="text-red-500">*</span></label>
-          <select 
-            id="adminRole"
-            name="role" 
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-            required>
-            <option value="manager">Manager</option>
-            <option value="staff">Staff</option>
-          </select>
-      </div>
-
-    )}
-        </div>
+        </div> */}
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">

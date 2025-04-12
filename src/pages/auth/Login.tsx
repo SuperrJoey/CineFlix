@@ -7,11 +7,11 @@ import { Eye, EyeOff } from "lucide-react";
 const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({ username: "", password: "", role: "" });
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -21,42 +21,25 @@ const Login = () => {
     try {
       const { username, password } = formData;
       const res = await axios.post("http://localhost:5000/api/auth/login", {
-        username, 
+        username,
         password
       });
 
-      const { token, role, name } = res.data;
+      const { token, role, name, isAdmin } = res.data;
       localStorage.setItem("token", token);
       localStorage.setItem("user", role);
       localStorage.setItem("Name", name);
 
-      // Route based on role
-      navigate(role === "admin" ? "/dashboard" : "/client-dashboard");
+      // Route based on whether user is admin or not
+      navigate(isAdmin ? "/dashboard" : "/client-dashboard");
     } catch (error) {
-      setError("Invalid email or password");
+      setError("Invalid username or password");
     }
   };
 
   return (
     <div>
       <form onSubmit={handleLogin}>
-      <div className="mb-4">
-          <label htmlFor="role" className="block text-sm font-medium text-black mb-1">
-            Select Role <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 bg-white-800 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <option value="client">Client</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-
-
         <div className="mb-4">
           <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
             Username <span className="text-red-500">*</span>
@@ -103,12 +86,12 @@ const Login = () => {
         )}
 
         <div className="flex flex-col justify-center items-center">
-        <button
-          type="submit"
-          className="px-6 inline-block bg-green-500 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
-        >
-          Sign in
-        </button>
+          <button
+            type="submit"
+            className="px-6 inline-block bg-green-500 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+          >
+            Sign in
+          </button>
         </div>
 
         <div className="mt-6 text-center">

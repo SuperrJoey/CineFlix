@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { format, addDays, isAfter, isBefore, parseISO } from 'date-fns';
+import PageWrapper from "../../components/pageWrapper";
 
 interface Movie {
   Title: string;
@@ -352,7 +353,7 @@ export const MovieDetails = () => {
                   {showtimes.map((showtime) => {
                     const { available, trending } = getBookingStatus(showtime);
                     return (
-                      <div key={showtime.ShowtimeID} className="flex flex-col sm:flex-row sm:items-center justify-between bg-green-900/20 p-4 rounded-lg gap-3">
+                      <div key={showtime.ShowtimeID} className="w-full flex flex-col sm:flex-row sm:items-center justify-between bg-green-900/20 p-4 rounded-lg gap-3">
                         <div className="space-y-1">
                           <p className="text-white font-medium">
                             {formatShowtime(showtime.StartTime)}
@@ -369,7 +370,7 @@ export const MovieDetails = () => {
                             </span>
                           )}
                           <button
-                            className={`w-full sm:w-auto px-6 py-2 rounded-full font-medium transition-all text-sm
+                            className={`w-full px-6 py-2 rounded-full font-medium transition-all text-sm
                               ${available 
                                 ? 'bg-green-600 hover:bg-green-700 text-white' 
                                 : 'bg-gray-600 text-gray-300 cursor-not-allowed'}`}

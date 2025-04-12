@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { AddMovieDialog } from "../../components/AddMovieDialog";
+import PageWrapper from "../../components/pageWrapper";
 
 interface Movie {
     MovieID: number;
@@ -105,6 +106,7 @@ export const Movies = () => {
     }
     
     return (
+    <PageWrapper>
         <div className="min-h-screen bg-gradient-to-br from-green-950 via-black to-black">
             <div className="absolute inset-0 bg-gradient-to-r from-green-950/20 to-black/20 pointer-events-none">
             </div>
@@ -187,5 +189,6 @@ export const Movies = () => {
                 />
             </div>
         </div>
+    </PageWrapper>
     )
 }

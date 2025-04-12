@@ -51,12 +51,6 @@ const Header = () => {
                                     Staff
                                 </button>
                                 <button
-                                    className={`transition-all ${isActive('/maintenance') ? 'text-white font-bold' : 'text-gray-300 hover:text-white'}`}
-                                    onClick={() => navigate('/maintenance')}
-                                >
-                                    Maintenance
-                                </button>
-                                <button
                                     className={`transition-all ${isActive('/customer') ? 'text-white font-bold' : 'text-gray-300 hover:text-white'}`}
                                     onClick={() => navigate('/customer')}
                                 >

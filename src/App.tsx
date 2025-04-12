@@ -10,7 +10,6 @@ import Staff from './pages/staff/page'
 import Header from './components/Header'
 import Customer from './pages/customer/page'
 import Report from './pages/report/page'
-import Maintenance from './pages/maintenance/page'
 import { useEffect, useState } from 'react'
 import Signin from './pages/auth/Login'
 import Register from './pages/auth/Register'
@@ -116,11 +115,6 @@ function App() {
         <Route path="/staff" element={
           <ProtectedRoute requiredRole="admin">
             <Staff/>
-          </ProtectedRoute>
-        } />
-        <Route path="/maintenance" element={
-          <ProtectedRoute requiredRole="admin">
-            <Maintenance/>
           </ProtectedRoute>
         } />
         <Route path="/report" element={

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { format, addDays, isSameDay } from 'date-fns';
+import PageWrapper from '../../components/pageWrapper';
 
 interface Movie {
   MovieID: number;
@@ -118,6 +119,8 @@ const Seats = () => {
   }
 
   return (
+  <PageWrapper>
+
     <div className="min-h-screen bg-gradient-to-br from-green-950 via-black to-black py-20">
       <div className="container mx-auto px-4">
         {/* User Role Indicator for Admin */}
@@ -205,6 +208,7 @@ const Seats = () => {
         </div>
       </div>
     </div>
+  </PageWrapper>
   );
 };
 

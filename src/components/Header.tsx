@@ -17,7 +17,7 @@ const Header = () => {
     }
     
     return (
-        <header className="py-4 px-6 bg-transparent absolute w-full">
+        <header className="py-4 px-6 bg-transparent absolute w-full z-50">
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo on left */}
                 <button 

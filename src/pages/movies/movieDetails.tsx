@@ -263,7 +263,7 @@ export const MovieDetails = () => {
               </p>
             </div>
 
-            <div className="bg-black/40 p-4 rounded-lg backdrop-blur-sm">
+            <div className="bg-black/40 p-4 rounded-lg backdrop-blur-sm w-full">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-white">Showtimes</h2>
                 {isAdmin && !showAddForm && (
@@ -351,52 +351,62 @@ export const MovieDetails = () => {
                 </form>
               )}
 
-              {hasShowtimes ? (
-                <div className="space-y-3">
-                  {showtimes.map((showtime) => {
-                    const { available, trending } = getBookingStatus(showtime);
-                    return (
-                      <div key={showtime.ShowtimeID} className="w-full flex flex-col sm:flex-row sm:items-center justify-between bg-green-900/20 p-4 rounded-lg gap-3">
-                        <div className="space-y-1">
-                          <p className="text-white font-medium">
-                            {formatShowtime(showtime.StartTime)}
-                          </p>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-400 text-sm">Screen</span>
-                            <span className="text-white text-sm">{showtime.screenID}</span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                          {trending && (
-                            <span className="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-full text-sm">
-                              🔥 Trending
-                            </span>
-                          )}
-                          <button
-                            className={`w-full px-6 py-2 rounded-full font-medium transition-all text-sm
-                              ${available 
-                                ? 'bg-green-600 hover:bg-green-700 text-white' 
-                                : 'bg-gray-600 text-gray-300 cursor-not-allowed'}`}
-                            disabled={!available}
-                            onClick={() => available && navigate(`/booking/${showtime.screenID}/${showtime.ShowtimeID}`)}
-                          >
-                            {available ? 'Book Now' : 'Sold Out'}
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-400">No showtimes available at the moment</p>
-                  {isAdmin ? (
-                    <p className="text-gray-500 text-sm mt-2">Add a showtime using the button above</p>
-                  ) : (
-                    <p className="text-gray-500 text-sm mt-2">Please check back later for updates</p>
-                  )}
-                </div>
-              )}
+{hasShowtimes ? (
+  <div className="space-y-3 w-full">
+    {showtimes.map((showtime) => {
+      const { available, trending } = getBookingStatus(showtime);
+      return (
+        <div key={showtime.ShowtimeID} className="w-full flex flex-col sm:flex-row sm:items-center justify-between bg-green-900/20 p-4 rounded-lg gap-3">
+          <div className="space-y-1 flex-grow">
+            <p className="text-white font-medium">
+              {formatShowtime(showtime.StartTime)}
+            </p>
+            <div className="flex items-center gap-1.5">
+              <span className="text-gray-400 text-sm">Screen</span>
+              <span className="text-white text-sm">{showtime.screenID}</span>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:min-width-[180px]">
+            {trending && (
+              <span className="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-full text-sm whitespace-nowrap">
+                🔥 Trending
+              </span>
+            )}
+           {isAdmin ? (
+  <button
+    onClick={() => navigate(`/admin/booking/${showtime.screenID}/${showtime.ShowtimeID}`)}
+    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition-colors text-sm"
+  >
+    Show
+  </button>
+) : (
+  <button
+    className={`w-full sm:w-auto px-6 py-2 rounded-full font-medium transition-all text-sm whitespace-nowrap
+      ${available 
+        ? 'bg-green-600 hover:bg-green-700 text-white' 
+        : 'bg-gray-600 text-gray-300 cursor-not-allowed'}`}
+    disabled={!available}
+    onClick={() => available && navigate(`/booking/${showtime.screenID}/${showtime.ShowtimeID}`)}
+  >
+    {available ? 'Book Now' : 'Sold Out'}
+  </button>
+)}
+
+          </div>
+        </div>
+      );
+    })}
+  </div>
+) : (
+  <div className="text-center py-8">
+    <p className="text-gray-400">No showtimes available at the moment</p>
+    {isAdmin ? (
+      <p className="text-gray-500 text-sm mt-2">Add a showtime using the button above</p>
+    ) : (
+      <p className="text-gray-500 text-sm mt-2">Please check back later for updates</p>
+    )}
+  </div>
+)}
             </div>
 
               </div>

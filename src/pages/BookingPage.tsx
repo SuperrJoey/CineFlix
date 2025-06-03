@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MdEventSeat } from 'react-icons/md';
 import axios from 'axios';
+import { io, Socket } from 'socket.io-client';
 import BookingModal from '../components/BookingModal';
 
 interface Seat {
@@ -11,7 +12,8 @@ interface Seat {
   ShowtimeID: number;
   AvailabilityStatus: string;
   BookingID: number | null;
-  Duration: number;
+  temporarilyReserved?: boolean;
+  reservedByMe?: boolean;
 }
 
 interface Showtime {
@@ -23,6 +25,17 @@ interface Showtime {
   Title: string;
   Genre: string;
   Duration: number;
+}
+
+interface SeatSelectionUpdate {
+  seatId: number;
+  isSelected: boolean;
+  socketId: string;
+}
+
+interface SeatReservation {
+  seatId: number;
+  socketId: string;
 }
 
 const BookingPage = () => {
@@ -44,6 +57,7 @@ const BookingPage = () => {
     seatNumbers: [],
     duration: 0
   });
+  const socketRef = useRef<Socket | null>(null);
   const MAX_SEATS_PER_BOOKING = 4;
 
   useEffect(() => {
@@ -55,12 +69,106 @@ const BookingPage = () => {
     }
     setIsAuthenticated(true);
 
+    // Initialize Socket.IO connection
+    socketRef.current = io('http://localhost:5000');
+    
+    const socket = socketRef.current;
+
+    // Setup socket event listeners
+    socket.on('connect', () => {
+      console.log('Connected to socket server with ID:', socket.id);
+    });
+
+    socket.on('seat_temporarily_reserved', (data: SeatReservation) => {
+      console.log('Seat temporarily reserved:', data);
+      setSeats(prev => prev.map(seat => {
+        if (seat.SeatID === data.seatId) {
+          return {
+            ...seat,
+            temporarilyReserved: true,
+            reservedByMe: data.socketId === socket.id
+          };
+        }
+        return seat;
+      }));
+    });
+
+    socket.on('seat_reservation_released', (data: SeatReservation) => {
+      console.log('Seat reservation released:', data);
+      setSeats(prev => prev.map(seat => {
+        if (seat.SeatID === data.seatId) {
+          return {
+            ...seat,
+            temporarilyReserved: false,
+            reservedByMe: false
+          };
+        }
+        return seat;
+      }));
+    });
+
+    socket.on('seat_reservation_expired', (data: SeatReservation) => {
+      console.log('Seat reservation expired:', data);
+      setSeats(prev => prev.map(seat => {
+        if (seat.SeatID === data.seatId) {
+          return {
+            ...seat,
+            temporarilyReserved: false,
+            reservedByMe: false
+          };
+        }
+        return seat;
+      }));
+      
+      // If it was my reservation that expired, remove from selected seats
+      if (data.socketId === socket.id) {
+        setSelectedSeats(prev => prev.filter(id => id !== data.seatId));
+      }
+    });
+
+    socket.on('seats_booked', (data: { seatIds: number[], socketId: string }) => {
+      console.log('Seats booked:', data);
+      setSeats(prev => prev.map(seat => {
+        if (data.seatIds.includes(seat.SeatID)) {
+          return {
+            ...seat,
+            AvailabilityStatus: 'booked',
+            temporarilyReserved: false,
+            reservedByMe: false
+          };
+        }
+        return seat;
+      }));
+      
+      // If these were seats I temporarily selected but someone else booked them, remove from my selection
+      if (data.socketId !== socket.id) {
+        setSelectedSeats(prev => prev.filter(id => !data.seatIds.includes(id)));
+      }
+    });
+
+    socket.on('booking_cancelled', (data: { seatIds: number[] }) => {
+      console.log('Booking cancelled, seats available again:', data);
+      setSeats(prev => prev.map(seat => {
+        if (data.seatIds.includes(seat.SeatID)) {
+          return {
+            ...seat,
+            AvailabilityStatus: 'available',
+            BookingID: null
+          };
+        }
+        return seat;
+      }));
+    });
+
     const fetchShowtimeAndSeats = async () => {
       try {
         setLoading(true);
         
         // If we have a showtimeId, use it directly
         if (showtimeId) {
+          // Join the socket room for this showtime
+          socket.emit('join_showtime', showtimeId);
+          
           // Fetch showtime details
           const showtimeResponse = await axios.get(`http://localhost:5000/api/showtimes/${showtimeId}`);
           
@@ -69,7 +177,14 @@ const BookingPage = () => {
             
             // Then fetch seats for this showtime
             const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${showtimeId}`);
-            setSeats(seatsResponse.data);
+            
+            // Process seat data to mark any temporarily reserved seats
+            const processedSeats = seatsResponse.data.map((seat: Seat) => ({
+              ...seat,
+              reservedByMe: seat.temporarilyReserved && false // Will be updated when we know our socket ID
+            }));
+            
+            setSeats(processedSeats);
           } else {
             setError("Showtime not found");
           }
@@ -92,6 +207,9 @@ const BookingPage = () => {
           if (currentShowtime) {
             setShowtime(currentShowtime);
             
+            // Join the socket room for this showtime
+            socket.emit('join_showtime', currentShowtime.ShowtimeID);
+            
             // Then fetch seats for this showtime
             const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${currentShowtime.ShowtimeID}`);
             setSeats(seatsResponse.data);
@@ -110,6 +228,13 @@ const BookingPage = () => {
     };
 
     fetchShowtimeAndSeats();
+
+    // Cleanup function
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
   }, [screenId, showtimeId, navigate]);
 
   const refreshSeats = async () => {
@@ -124,8 +249,8 @@ const BookingPage = () => {
     }
   };
   
-  const handleSeatClick = (seatId: number) => {
-    if (!isAuthenticated) {
+  const handleSeatClick = async (seatId: number) => {
+    if (!isAuthenticated || !socketRef.current || !showtime) {
       navigate('/signin');
       return;
     }
@@ -135,22 +260,46 @@ const BookingPage = () => {
     if (seat && seat.AvailabilityStatus === 'booked') {
       return;
     }
+    
+    // Check if seat is temporarily reserved by someone else
+    if (seat && seat.temporarilyReserved && !seat.reservedByMe) {
+      alert('This seat is currently selected by another user');
+      return;
+    }
 
-    setSelectedSeats(prev => {
-      // If seat is already selected, remove it
-      if (prev.includes(seatId)) {
-        return prev.filter(id => id !== seatId);
-      }
+    const isAlreadySelected = selectedSeats.includes(seatId);
+    
+    try {
+      // Send reservation request to server
+      const response = await axios.post(`http://localhost:5000/api/seats/showtime/${showtime.ShowtimeID}/reserve`, {
+        seatId,
+        socketId: socketRef.current.id,
+        isReserving: !isAlreadySelected
+      });
       
-      // If adding this seat would exceed the limit, show an alert
-      if (prev.length >= MAX_SEATS_PER_BOOKING) {
-        alert(`You can only book a maximum of ${MAX_SEATS_PER_BOOKING} seats per booking.`);
-        return prev;
+      if (response.status === 200) {
+        // Update local state only after server confirms
+        setSelectedSeats(prev => {
+          if (isAlreadySelected) {
+            return prev.filter(id => id !== seatId);
+          } else {
+            // If adding this seat would exceed the limit, show an alert
+            if (prev.length >= MAX_SEATS_PER_BOOKING) {
+              alert(`You can only book a maximum of ${MAX_SEATS_PER_BOOKING} seats per booking.`);
+              return prev;
+            }
+            return [...prev, seatId];
+          }
+        });
       }
-      
-      // Otherwise, add the seat
-      return [...prev, seatId];
-    });
+    } catch (error: any) {
+      console.error('Error reserving seat:', error);
+      if (error.response?.status === 409) {
+        alert('This seat was just selected by another user');
+      } else {
+        alert('Failed to select seat. Please try again.');
+      }
+    }
   };
 
   const handleBooking = async () => {
@@ -161,11 +310,14 @@ const BookingPage = () => {
 
     try {
       const token = localStorage.getItem('token');
-      if (!token || !showtime) return;
+      if (!token || !showtime || !socketRef.current) return;
 
       const response = await axios.post(
         `http://localhost:5000/api/seats/showtime/${showtime.ShowtimeID}/book`,
-        { seatIds: selectedSeats },
+        { 
+          seatIds: selectedSeats,
+          socketId: socketRef.current.id
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -189,9 +341,14 @@ const BookingPage = () => {
       } else {
         alert('Booking failed. Please try again.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Booking error:', error);
-      alert('Failed to book seats. Please try again.');
+      if (error.response?.status === 409) {
+        alert('Some of the selected seats are no longer available. Please refresh and try again.');
+        refreshSeats();
+      } else {
+        alert('Failed to book seats. Please try again.');
+      }
     }
   };
 
@@ -224,18 +381,21 @@ const BookingPage = () => {
           <div className="text-center mb-6 text-white">
             <h2 className="text-xl font-semibold">{showtime.Title}</h2>
             <p className="text-gray-300">
-                    {new Date(showtime.StartTime).toLocaleString('en-IN', {
-                        weekday: 'long',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                    })} • Screen {showtime.screenID}
-                    </p>
+              {new Date(showtime.StartTime).toLocaleString('en-IN', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+              })} • Screen {showtime.screenID}
+            </p>
 
             <p className="text-gray-300 mt-2">
               Maximum {MAX_SEATS_PER_BOOKING} seats per booking
+            </p>
+            <p className="text-yellow-400 text-sm animate-pulse mt-1">
+              Seats are reserved for 5 minutes once selected
             </p>
           </div>
         )}
@@ -246,28 +406,40 @@ const BookingPage = () => {
               <button
                 key={seat.SeatID}
                 onClick={() => handleSeatClick(seat.SeatID)}
-                disabled={seat.AvailabilityStatus === 'booked' || 
-                         (selectedSeats.length >= MAX_SEATS_PER_BOOKING && 
-                          !selectedSeats.includes(seat.SeatID))}
+                disabled={
+                  seat.AvailabilityStatus === 'booked' || 
+                  (seat.temporarilyReserved && !seat.reservedByMe) ||
+                  (selectedSeats.length >= MAX_SEATS_PER_BOOKING && !selectedSeats.includes(seat.SeatID))
+                }
                 className={`
-                  p-2 rounded-lg transition-colors
+                  p-2 rounded-lg transition-colors relative
                   ${seat.AvailabilityStatus === 'booked'
                     ? 'bg-red-500 cursor-not-allowed' 
-                    : selectedSeats.includes(seat.SeatID)
-                      ? 'bg-green-500' 
-                      : selectedSeats.length >= MAX_SEATS_PER_BOOKING
-                        ? 'bg-white opacity-50 cursor-not-allowed'
-                        : 'bg-white hover:bg-gray-200'
+                    : seat.temporarilyReserved
+                      ? seat.reservedByMe
+                        ? 'bg-green-500' // My reservation
+                        : 'bg-yellow-400 cursor-not-allowed' // Someone else's reservation
+                      : selectedSeats.includes(seat.SeatID)
+                        ? 'bg-green-500' 
+                        : selectedSeats.length >= MAX_SEATS_PER_BOOKING
+                          ? 'bg-white opacity-50 cursor-not-allowed'
+                          : 'bg-white hover:bg-gray-200'
                   }
                   border border-gray-300
                 `}
               >
                 <MdEventSeat className="w-6 h-6" />
+                {seat.temporarilyReserved && !seat.reservedByMe && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="animate-ping absolute h-3 w-3 rounded-full bg-yellow-400 opacity-75"></div>
+                    <div className="relative h-2 w-2 rounded-full bg-yellow-500"></div>
+                  </div>
+                )}
               </button>
             ))}
           </div>
 
-          <div className="flex justify-center gap-8 mb-8">
+          <div className="flex justify-center gap-6 mb-8 flex-wrap">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 bg-white border border-gray-300 rounded-lg"></div>
               <span>Available</span>
@@ -278,7 +450,16 @@ const BookingPage = () => {
             </div>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 bg-green-500 rounded-lg"></div>
-              <span>Selected</span>
+              <span>Selected by you</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 bg-yellow-400 relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="animate-ping absolute h-3 w-3 bg-yellow-400 opacity-75"></div>
+                  <div className="relative h-2 w-2 rounded-full bg-yellow-500"></div>
+                </div>
+              </div>
+              <span>Selected by others</span>
             </div>
           </div>
 
@@ -289,7 +470,13 @@ const BookingPage = () => {
             </p>
             <button
               onClick={handleBooking}
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={selectedSeats.length === 0}
+              className={`
+                px-8 py-3 rounded-lg transition-colors
+                ${selectedSeats.length === 0 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-blue-600 text-white hover:bg-blue-700'}
+              `}
             >
               Proceed to Payment
             </button>
@@ -297,12 +484,12 @@ const BookingPage = () => {
         </div>
       </div>
       <BookingModal isOpen={isModalOpen} onClose={() => {
-            setIsModalOpen(false);
-            refreshSeats(); // Refresh seat data
-          }}
-          bookingDetails={bookingDetails} />
-              </div>
-            );
-          };
+        setIsModalOpen(false);
+        refreshSeats(); // Refresh seat data
+      }}
+      bookingDetails={bookingDetails} />
+    </div>
+  );
+};
 
-export default BookingPage; 
+export default BookingPage;

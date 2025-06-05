@@ -25,16 +25,46 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   const userRole = localStorage.getItem('user');
+  const token = localStorage.getItem('token');
   
-  if (!localStorage.getItem('token')) {
+  console.log("🔐 ProtectedRoute check:");
+  console.log("- requiredRole:", requiredRole);
+  console.log("- userRole from localStorage:", userRole);
+  console.log("- token exists:", !!token);
+  
+  if (!token) {
+    console.log("❌ No token, redirecting to home");
     return <Navigate to="/" replace />;
   }
   
-  if (requiredRole && userRole !== requiredRole) {
-    return <Navigate to="/" replace />;
+  // If no specific role is required, just check if user is authenticated
+  if (!requiredRole) {
+    console.log("✅ No specific role required, allowing access");
+    return <>{children}</>;
   }
   
-  return children;
+  // For admin routes, check if user has admin role
+  if (requiredRole === 'admin') {
+    console.log("🔍 Admin route check - userRole:", userRole, "required: admin");
+    // Check if user role is admin (this covers admin, adminRole manager, etc.)
+    if (userRole !== 'admin') {
+      console.log("❌ User is not admin, redirecting to home");
+      return <Navigate to="/" replace />;
+    }
+    console.log("✅ Admin access granted");
+  }
+  
+  // For user routes, check if user has user role
+  if (requiredRole === 'user') {
+    console.log("🔍 User route check - userRole:", userRole, "required: user");
+    if (userRole !== 'user') {
+      console.log("❌ User is not regular user, redirecting to home");
+      return <Navigate to="/" replace />;
+    }
+    console.log("✅ User access granted");
+  }
+  
+  return <>{children}</>;
 };
 
 const HeaderLayout = () => {

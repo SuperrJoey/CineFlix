@@ -5,21 +5,21 @@ import { format, addDays, isSameDay } from 'date-fns';
 import PageWrapper from '../../components/pageWrapper';
 
 interface Movie {
-  MovieID: number;
-  Title: string;
-  Genre: string;
-  Duration: number;
+  movieid: number;
+  title: string;
+  genre: string;
+  duration: number;
 }
 
 interface Showtime {
-  ShowtimeID: number;
-  MovieID: number;
-  screenID: number;
-  StartTime: string;
-  EndTime: string;
-  Title: string;
-  Genre: string;
-  Duration: number;
+  showtimeid: number;
+  movieid: number;
+  screenid: number;
+  starttime: string;
+  endtime: string;
+  title: string;
+  genre: string;
+  duration: number;
 }
 
 interface GroupedShowtimes {
@@ -70,19 +70,19 @@ const Seats = () => {
   // Group showtimes by movie for the selected date
   const groupedShowtimes: GroupedShowtimes = {};
   showtimes.forEach(showtime => {
-    const showtimeDate = new Date(showtime.StartTime);
+    const showtimeDate = new Date(showtime.starttime);
     if (isSameDay(showtimeDate, selectedDate)) {
-      if (!groupedShowtimes[showtime.MovieID]) {
-        const movie = movies.find(m => m.MovieID === showtime.MovieID);
+      if (!groupedShowtimes[showtime.movieid]) {
+        const movie = movies.find(m => m.movieid === showtime.movieid);
         if (movie) {
-          groupedShowtimes[showtime.MovieID] = {
+          groupedShowtimes[showtime.movieid] = {
             movie,
             showtimes: []
           };
         }
       }
-      if (groupedShowtimes[showtime.MovieID]) {
-        groupedShowtimes[showtime.MovieID].showtimes.push(showtime);
+      if (groupedShowtimes[showtime.movieid]) {
+        groupedShowtimes[showtime.movieid].showtimes.push(showtime);
       }
     }
   });
@@ -158,23 +158,23 @@ const Seats = () => {
         {/* Movies and Showtimes */}
         <div className="space-y-8">
           {Object.values(groupedShowtimes).map(({ movie, showtimes }) => (
-            <div key={movie.MovieID} className="bg-white/5 rounded-lg p-6">
+            <div key={movie.movieid} className="bg-white/5 rounded-lg p-6">
               <div className="mb-4">
-                <h2 className="text-2xl font-bold text-white">{movie.Title}</h2>
+                <h2 className="text-2xl font-bold text-white">{movie.title}</h2>
                 <div className="flex gap-4 text-gray-400 text-sm mt-2">
-                  <span>{movie.Genre}</span>
+                  <span>{movie.genre}</span>
                   <span>•</span>
-                  <span>{movie.Duration} mins</span>
+                  <span>{movie.duration} mins</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {showtimes
-                  .sort((a, b) => new Date(a.StartTime).getTime() - new Date(b.StartTime).getTime())
+                  .sort((a, b) => new Date(a.starttime).getTime() - new Date(b.starttime).getTime())
                   .map((showtime) => (
                     <button
-                      key={showtime.ShowtimeID}
-                      onClick={() => handleShowtimeClick(showtime.screenID, showtime.ShowtimeID)}
+                      key={showtime.showtimeid}
+                      onClick={() => handleShowtimeClick(showtime.screenid, showtime.showtimeid)}
                       className={`
                         rounded-lg p-4 transition-colors
                         ${userRole === 'admin' 
@@ -183,10 +183,10 @@ const Seats = () => {
                       `}
                     >
                       <div className="text-lg font-semibold">
-                        {format(new Date(showtime.StartTime), 'hh:mm a')}
+                        {format(new Date(showtime.starttime), 'hh:mm a')}
                       </div>
                       <div className="text-sm text-gray-400 mt-1">
-                        Screen {showtime.screenID}
+                        Screen {showtime.screenid}
                       </div>
                       {userRole === 'admin' && (
                         <div className="text-xs text-yellow-300 mt-1">

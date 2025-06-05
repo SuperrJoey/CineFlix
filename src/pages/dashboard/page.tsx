@@ -25,12 +25,6 @@ const DashboardCard = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="group relative bg-gradient-to-br from-zinc-900/90 to-zinc-800/80 backdrop-blur-md border border-green-500/30 p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-green-500/20 transform hover:scale-105 transition-all duration-500 text-white text-left overflow-hidden"
-      style={{
-        animation: `cardEntrance 0.8s ease-out forwards`,
-        animationDelay: `${index * 0.15}s`,
-        opacity: 0,
-        transform: 'translateY(30px)'
-      }}
     >
       {/* Animated Background Glow */}
       <div className={`absolute inset-0 bg-gradient-to-br from-green-500/0 to-green-500/10 transform transition-all duration-500 ${
@@ -82,6 +76,11 @@ const Dashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
+    console.log("Dashboard component mounted");
+    console.log("User role:", localStorage.getItem('user'));
+    console.log("Token:", localStorage.getItem('token'));
+    console.log("Username:", localStorage.getItem('Name'));
+    
     setIsVisible(true);
     
     // Update time every minute
@@ -115,13 +114,13 @@ const Dashboard = () => {
       icon: "👥",
       title: "Customers",
       description: "Manage customer details and preferences.",
-      onClick: () => navigate("/staff")
+      onClick: () => navigate("/customer")
     },
     {
       icon: "📃",
       title: "Reports",
       description: "Generate insights, revenue reports, and trends.",
-      onClick: () => navigate("/staff")
+      onClick: () => navigate("/report")
     }
   ];
 
@@ -211,9 +210,7 @@ const Dashboard = () => {
           <div className="relative z-10 max-w-6xl mx-auto bg-transparent rounded-2xl shadow-lg p-8 border border-green-500/20 backdrop-blur-sm">
             <div className="flex flex-col">
               {/* Original Header with Enhanced Animation */}
-              <div className={`transform transition-all duration-1000 ease-out ${
-                isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-              }`}>
+              <div className="translate-y-0 opacity-100">
                 <h1 className="text-4xl font-extrabold text-gray-300 mb-2">
                   Welcome, {username}
                 </h1>
@@ -223,9 +220,7 @@ const Dashboard = () => {
               </div>
 
               {/* Time Display */}
-              <div className={`flex items-center justify-center mb-8 transform transition-all duration-1000 delay-300 ${
-                isVisible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'
-              }`}>
+              <div className="flex items-center justify-center mb-8 translate-y-0 opacity-100">
                 <div className="bg-zinc-900/60 backdrop-blur-md rounded-lg px-4 py-2 border border-green-500/20">
                   <div className="flex items-center space-x-3 text-gray-400">
                     <Clock className="w-4 h-4 text-green-400" />
@@ -237,9 +232,7 @@ const Dashboard = () => {
               </div>
 
               {/* Quick Stats Overview */}
-              <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 transform transition-all duration-1000 delay-500 ${
-                isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-              }`}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 translate-y-0 opacity-100">
                 <div className="bg-gradient-to-br from-zinc-900/70 to-zinc-800/50 backdrop-blur-md rounded-xl p-4 border border-green-500/20 text-center">
                   <div className="text-2xl font-bold text-green-400">$12,450</div>
                   <div className="text-sm text-gray-400">Today's Revenue</div>
@@ -257,9 +250,7 @@ const Dashboard = () => {
               </div>
 
               {/* Enhanced Dashboard Grid */}
-              <div className={`transform transition-all duration-1000 delay-700 ${
-                isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-              }`}>
+              <div className="translate-y-0 opacity-100">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-white">Quick Actions</h2>
                   <Sparkles className="w-5 h-5 text-green-400 animate-pulse" />

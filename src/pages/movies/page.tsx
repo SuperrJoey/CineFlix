@@ -6,11 +6,11 @@ import { AddMovieDialog } from "../../components/AddMovieDialog";
 import PageWrapper from "../../components/pageWrapper";
 
 interface Movie {
-    MovieID: number;
-    Title: string;
-    Duration: number;
-    Genre: string;
-    Rating: number;
+    movieid: number;
+    title: string;
+    duration: number;
+    genre: string;
+    rating: string;
     poster_url: string;
 }
 
@@ -56,16 +56,16 @@ export const Movies = () => {
 
     useEffect(() => {
         if (movies.length > 0) {
-            const sortedByRating = [...movies].sort((a, b) => b.Rating - a.Rating);
+            const sortedByRating = [...movies].sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
             const topRated = sortedByRating.slice(0,10);
 
             const genreMap: {[key: string]: Movie[]} = {};
 
             movies.forEach(movie => {
-                if (!genreMap[movie.Genre]) {
-                    genreMap[movie.Genre] = [];
+                if (!genreMap[movie.genre]) {
+                    genreMap[movie.genre] = [];
                 }
-                genreMap[movie.Genre].push(movie);
+                genreMap[movie.genre].push(movie);
             });
 
             const groups: GenreGroup[] = [
@@ -150,23 +150,23 @@ export const Movies = () => {
                             >
                                 {group.movies.map(movie => (
                                     <Link 
-                                        key={`${group.genre}-${movie.MovieID}`}
-                                        to={`/movies/${movie.MovieID}`}
+                                        key={`${group.genre}-${movie.movieid}`}
+                                        to={`/movies/${movie.movieid}`}
                                         className="flex-shrink-0 w-48 group relative bg-transparent border-[#6A7077]
                                         border rounded-[15px] p-3 mt-3 shadow-lg transform transition hover:scale-105 hover:shadow-xl"
                                     >
                                         <div>
                                             <img src={movie.poster_url}
-                                                alt={movie.Title}
+                                                alt={movie.title}
                                                 className="w-full h-full object-cover rounded-lg group-hover:opacity-80 transition" 
                                             />
                                             <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg
                                             opacity-0 group-hover:opacity-100 transition"></div>
                                         </div>
                                         <h3 className="text-lg font-semibold text-white mt-2 truncate">
-                                            {movie.Title}
+                                            {movie.title}
                                         </h3>
-                                        <p className="text-gray-400 mt-2 text-sm">{movie.Duration}mins</p>
+                                        <p className="text-gray-400 mt-2 text-sm">{movie.duration}mins</p>
                                     </Link>
                                 ))}
                             </div>

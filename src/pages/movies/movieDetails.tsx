@@ -5,28 +5,28 @@ import { format, addDays, isAfter, isBefore, parseISO } from 'date-fns';
 import PageWrapper from "../../components/pageWrapper";
 
 interface Movie {
-  Title: string;
-  Duration: number;
-  Genre: string;
-  Rating: number;
+  title: string;
+  duration: number;
+  genre: string;
+  rating: string;
   poster_url: string;
   overview: string;
   revenue: number;
 }
 
 interface Showtime {
-  ShowtimeID: number;
-  MovieID: number;
-  screenID: number;
-  StartTime: string;
-  Title: string;
-  Genre: string;
-  Duration: number;
+  showtimeid: number;
+  movieid: number;
+  screenid: number;
+  starttime: string;
+  title: string;
+  genre: string;
+  duration: number;
   seats?: {
-    SeatID: number;
-    SeatNumber: number;
-    screenID: number;
-    AvailabilityStatus: string;
+    seatid: number;
+    seatnumber: number;
+    screenid: number;
+    availabilitystatus: string;
   }[];
 }
 
@@ -154,7 +154,7 @@ export const MovieDetails = () => {
   const getBookingStatus = (showtime: Showtime) => {
     if (!showtime.seats) return { available: false, trending: false };
     const total = showtime.seats.length;
-    const booked = showtime.seats.filter(seat => seat.AvailabilityStatus === 'booked').length;
+    const booked = showtime.seats.filter(seat => seat.availabilitystatus === 'booked').length;
 
     return {
       available: booked < total,
@@ -233,7 +233,7 @@ export const MovieDetails = () => {
               <div className="rounded-lg overflow-hidden shadow-2xl">
                 <img 
                   src={movie.poster_url} 
-                  alt={movie.Title}
+                  alt={movie.title}
                   className="w-full h-auto object-cover" 
                   />
               </div>
@@ -241,20 +241,20 @@ export const MovieDetails = () => {
             {/* right */}
             <div className="flex-1 space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h1 className="text-4xl font-bold text-white">{movie.Title}</h1>
+                <h1 className="text-4xl font-bold text-white">{movie.title}</h1>
                 
               </div>
 
               <div className="flex flex-wrap gap-4">
                 <div className="bg-green-900/30 px-4 py-2 rounded-full">
-                  <span className="text-gray-300">{movie.Genre}</span>
+                  <span className="text-gray-300">{movie.genre}</span>
                 </div>
                 <div className="bg-green-900/30 px-4 py-2 rounded-full">
-                  <span className="text-gray-300">{movie.Duration} mins</span>
+                  <span className="text-gray-300">{movie.duration} mins</span>
                 </div>
                 <div className="bg-green-900/30 px-4 py-2 rounded-full">
                   <span className="text-yellow-400">⭐</span>
-                  <span className="text-white font-semibold">{movie.Rating}/10 </span>
+                  <span className="text-white font-semibold">{movie.rating}/10 </span>
                 </div>
                 <div className="bg-black/40 p-6 rounded-lg backdrop-blur-sm">
               <h2 className="text-xl font-semibold text-white mb-3">Overview</h2>
@@ -356,14 +356,14 @@ export const MovieDetails = () => {
     {showtimes.map((showtime) => {
       const { available, trending } = getBookingStatus(showtime);
       return (
-        <div key={showtime.ShowtimeID} className="w-full flex flex-col sm:flex-row sm:items-center justify-between bg-green-900/20 p-4 rounded-lg gap-3">
+        <div key={showtime.showtimeid} className="w-full flex flex-col sm:flex-row sm:items-center justify-between bg-green-900/20 p-4 rounded-lg gap-3">
           <div className="space-y-1 flex-grow">
             <p className="text-white font-medium">
-              {formatShowtime(showtime.StartTime)}
+              {formatShowtime(showtime.starttime)}
             </p>
             <div className="flex items-center gap-1.5">
               <span className="text-gray-400 text-sm">Screen</span>
-              <span className="text-white text-sm">{showtime.screenID}</span>
+              <span className="text-white text-sm">{showtime.screenid}</span>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:min-width-[180px]">
@@ -374,7 +374,7 @@ export const MovieDetails = () => {
             )}
            {isAdmin ? (
   <button
-    onClick={() => navigate(`/admin/booking/${showtime.screenID}/${showtime.ShowtimeID}`)}
+    onClick={() => navigate(`/admin/booking/${showtime.screenid}/${showtime.showtimeid}`)}
     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition-colors text-sm"
   >
     Show
@@ -386,7 +386,7 @@ export const MovieDetails = () => {
         ? 'bg-green-600 hover:bg-green-700 text-white' 
         : 'bg-gray-600 text-gray-300 cursor-not-allowed'}`}
     disabled={!available}
-    onClick={() => available && navigate(`/booking/${showtime.screenID}/${showtime.ShowtimeID}`)}
+    onClick={() => available && navigate(`/booking/${showtime.screenid}/${showtime.showtimeid}`)}
   >
     {available ? 'Book Now' : 'Sold Out'}
   </button>

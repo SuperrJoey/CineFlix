@@ -4,24 +4,24 @@ import { MdEventSeat } from 'react-icons/md';
 import axios from 'axios';
 
 interface Seat {
-  SeatID: number;
-  SeatNumber: number;
-  screenID: number;
-  ShowtimeID: number;
-  AvailabilityStatus: string;
-  BookingID: number | null;
-  Duration: number;
+  seatid: number;
+  seatnumber: number;
+  screenid: number;
+  showtimeid: number;
+  availabilitystatus: string;
+  bookingid: number | null;
+  duration: number;
 }
 
 interface Showtime {
-  ShowtimeID: number;
-  MovieID: number;
-  screenID: number;
-  StartTime: string;
-  EndTime: string;
-  Title: string;
-  Genre: string;
-  Duration: number;
+  showtimeid: number;
+  movieid: number;
+  screenid: number;
+  starttime: string;
+  endtime: string;
+  title: string;
+  genre: string;
+  duration: number;
 }
 
 interface BookingStats {
@@ -64,7 +64,7 @@ const AdminBookingView = () => {
             
             // Calculate statistics
             const totalSeats = seatsData.length;
-            const bookedSeats = seatsData.filter((seat: Seat) => seat.AvailabilityStatus === 'booked').length;
+            const bookedSeats = seatsData.filter((seat: Seat) => seat.availabilitystatus === 'booked').length;
             const availableSeats = totalSeats - bookedSeats;
             const occupancyRate = totalSeats > 0 ? (bookedSeats / totalSeats) * 100 : 0;
             
@@ -86,9 +86,9 @@ const AdminBookingView = () => {
           // Find the current showtime for this screen
           const currentTime = new Date();
           const currentShowtime = allShowtimesResponse.data.find((st: Showtime) => {
-            const startTime = new Date(st.StartTime);
-            const endTime = new Date(st.EndTime);
-            return st.screenID === parseInt(screenId) && 
+            const startTime = new Date(st.starttime);
+            const endTime = new Date(st.endtime);
+            return st.screenid === parseInt(screenId) && 
                    startTime <= currentTime && 
                    endTime >= currentTime;
           });
@@ -97,13 +97,13 @@ const AdminBookingView = () => {
             setShowtime(currentShowtime);
             
             // Then fetch seats for this showtime
-            const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${currentShowtime.ShowtimeID}`);
+            const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${currentShowtime.showtimeid}`);
             const seatsData = seatsResponse.data;
             setSeats(seatsData);
             
             // Calculate statistics
             const totalSeats = seatsData.length;
-            const bookedSeats = seatsData.filter((seat: Seat) => seat.AvailabilityStatus === 'booked').length;
+            const bookedSeats = seatsData.filter((seat: Seat) => seat.availabilitystatus === 'booked').length;
             const availableSeats = totalSeats - bookedSeats;
             const occupancyRate = totalSeats > 0 ? (bookedSeats / totalSeats) * 100 : 0;
             
@@ -153,16 +153,16 @@ const AdminBookingView = () => {
         
         {showtime && (
           <div className="text-center mb-6 text-white">
-            <h2 className="text-xl font-semibold">{showtime.Title}</h2>
+            <h2 className="text-xl font-semibold">{showtime.title}</h2>
             <p className="text-gray-300">
-              {new Date(showtime.StartTime).toLocaleString('en-IN', {
+              {new Date(showtime.starttime).toLocaleString('en-IN', {
                 weekday: 'long',
                 month: 'long',
                 day: 'numeric',
                 hour: 'numeric',
                 minute: '2-digit',
                 hour12: true
-              })} • Screen {showtime.screenID}
+              })} • Screen {showtime.screenid}
             </p>
           </div>
         )}
@@ -193,10 +193,10 @@ const AdminBookingView = () => {
           <div className="grid grid-cols-10 gap-2 mb-8">
             {seats.map(seat => (
               <div
-                key={seat.SeatID}
+                key={seat.seatid}
                 className={`
                   p-2 rounded-lg flex items-center justify-center
-                  ${seat.AvailabilityStatus === 'booked'
+                  ${seat.availabilitystatus === 'booked'
                     ? 'bg-red-500 text-white' 
                     : 'bg-green-500 text-white'
                   }

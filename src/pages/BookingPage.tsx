@@ -6,25 +6,25 @@ import { io, Socket } from 'socket.io-client';
 import BookingModal from '../components/BookingModal';
 
 interface Seat {
-  SeatID: number;
-  SeatNumber: number;
-  screenID: number;
-  ShowtimeID: number;
-  AvailabilityStatus: string;
-  BookingID: number | null;
+  seatid: number;
+  seatnumber: number;
+  screenid: number;
+  showtimeid: number;
+  availabilitystatus: string;
+  bookingid: number | null;
   temporarilyReserved?: boolean;
   reservedByMe?: boolean;
 }
 
 interface Showtime {
-  ShowtimeID: number;
-  MovieID: number;
-  screenID: number;
-  StartTime: string;
-  EndTime: string;
-  Title: string;
-  Genre: string;
-  Duration: number;
+  showtimeid: number;
+  movieid: number;
+  screenid: number;
+  starttime: string;
+  endtime: string;
+  title: string;
+  genre: string;
+  duration: number;
 }
 
 interface SeatSelectionUpdate {
@@ -82,7 +82,7 @@ const BookingPage = () => {
     socket.on('seat_temporarily_reserved', (data: SeatReservation) => {
       console.log('Seat temporarily reserved:', data);
       setSeats(prev => prev.map(seat => {
-        if (seat.SeatID === data.seatId) {
+        if (seat.seatid === data.seatId) {
           return {
             ...seat,
             temporarilyReserved: true,
@@ -96,7 +96,7 @@ const BookingPage = () => {
     socket.on('seat_reservation_released', (data: SeatReservation) => {
       console.log('Seat reservation released:', data);
       setSeats(prev => prev.map(seat => {
-        if (seat.SeatID === data.seatId) {
+        if (seat.seatid === data.seatId) {
           return {
             ...seat,
             temporarilyReserved: false,
@@ -110,7 +110,7 @@ const BookingPage = () => {
     socket.on('seat_reservation_expired', (data: SeatReservation) => {
       console.log('Seat reservation expired:', data);
       setSeats(prev => prev.map(seat => {
-        if (seat.SeatID === data.seatId) {
+        if (seat.seatid === data.seatId) {
           return {
             ...seat,
             temporarilyReserved: false,
@@ -129,10 +129,10 @@ const BookingPage = () => {
     socket.on('seats_booked', (data: { seatIds: number[], socketId: string }) => {
       console.log('Seats booked:', data);
       setSeats(prev => prev.map(seat => {
-        if (data.seatIds.includes(seat.SeatID)) {
+        if (data.seatIds.includes(seat.seatid)) {
           return {
             ...seat,
-            AvailabilityStatus: 'booked',
+            availabilitystatus: 'booked',
             temporarilyReserved: false,
             reservedByMe: false
           };
@@ -149,11 +149,11 @@ const BookingPage = () => {
     socket.on('booking_cancelled', (data: { seatIds: number[] }) => {
       console.log('Booking cancelled, seats available again:', data);
       setSeats(prev => prev.map(seat => {
-        if (data.seatIds.includes(seat.SeatID)) {
+        if (data.seatIds.includes(seat.seatid)) {
           return {
             ...seat,
-            AvailabilityStatus: 'available',
-            BookingID: null
+            availabilitystatus: 'available',
+            bookingid: null
           };
         }
         return seat;
@@ -197,9 +197,9 @@ const BookingPage = () => {
           // Find the current showtime for this screen
           const currentTime = new Date();
           const currentShowtime = allShowtimesResponse.data.find((st: Showtime) => {
-            const startTime = new Date(st.StartTime);
-            const endTime = new Date(st.EndTime);
-            return st.screenID === parseInt(screenId) && 
+            const startTime = new Date(st.starttime);
+            const endTime = new Date(st.endtime);
+            return st.screenid === parseInt(screenId) && 
                    startTime <= currentTime && 
                    endTime >= currentTime;
           });
@@ -208,10 +208,10 @@ const BookingPage = () => {
             setShowtime(currentShowtime);
             
             // Join the socket room for this showtime
-            socket.emit('join_showtime', currentShowtime.ShowtimeID);
+            socket.emit('join_showtime', currentShowtime.showtimeid);
             
             // Then fetch seats for this showtime
-            const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${currentShowtime.ShowtimeID}`);
+            const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${currentShowtime.showtimeid}`);
             setSeats(seatsResponse.data);
           } else {
             setError("No active showtime found for this screen");
@@ -240,7 +240,7 @@ const BookingPage = () => {
   const refreshSeats = async () => {
     if (showtime) {
       try {
-        const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${showtime.ShowtimeID}`);
+        const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${showtime.showtimeid}`);
         setSeats(seatsResponse.data);
         setSelectedSeats([]); // Clear selection after booking
       } catch (error) {
@@ -256,8 +256,8 @@ const BookingPage = () => {
     }
 
     // Check if seat is already booked
-    const seat = seats.find(s => s.SeatID === seatId);
-    if (seat && seat.AvailabilityStatus === 'booked') {
+    const seat = seats.find(s => s.seatid === seatId);
+    if (seat && seat.availabilitystatus === 'booked') {
       return;
     }
     
@@ -271,7 +271,7 @@ const BookingPage = () => {
     
     try {
       // Send reservation request to server
-      const response = await axios.post(`http://localhost:5000/api/seats/showtime/${showtime.ShowtimeID}/reserve`, {
+      const response = await axios.post(`http://localhost:5000/api/seats/showtime/${showtime.showtimeid}/reserve`, {
         seatId,
         socketId: socketRef.current.id,
         isReserving: !isAlreadySelected
@@ -313,7 +313,7 @@ const BookingPage = () => {
       if (!token || !showtime || !socketRef.current) return;
 
       const response = await axios.post(
-        `http://localhost:5000/api/seats/showtime/${showtime.ShowtimeID}/book`,
+        `http://localhost:5000/api/seats/showtime/${showtime.showtimeid}/book`,
         { 
           seatIds: selectedSeats,
           socketId: socketRef.current.id
@@ -379,16 +379,16 @@ const BookingPage = () => {
         
         {showtime && (
           <div className="text-center mb-6 text-white">
-            <h2 className="text-xl font-semibold">{showtime.Title}</h2>
+            <h2 className="text-xl font-semibold">{showtime.title}</h2>
             <p className="text-gray-300">
-              {new Date(showtime.StartTime).toLocaleString('en-IN', {
+              {new Date(showtime.starttime).toLocaleString('en-IN', {
                 weekday: 'long',
                 month: 'long',
                 day: 'numeric',
                 hour: 'numeric',
                 minute: '2-digit',
                 hour12: true
-              })} • Screen {showtime.screenID}
+              })} • Screen {showtime.screenid}
             </p>
 
             <p className="text-gray-300 mt-2">
@@ -404,22 +404,22 @@ const BookingPage = () => {
           <div className="grid grid-cols-10 gap-2 mb-8">
             {seats.map(seat => (
               <button
-                key={seat.SeatID}
-                onClick={() => handleSeatClick(seat.SeatID)}
+                key={seat.seatid}
+                onClick={() => handleSeatClick(seat.seatid)}
                 disabled={
-                  seat.AvailabilityStatus === 'booked' || 
+                  seat.availabilitystatus === 'booked' || 
                   (seat.temporarilyReserved && !seat.reservedByMe) ||
-                  (selectedSeats.length >= MAX_SEATS_PER_BOOKING && !selectedSeats.includes(seat.SeatID))
+                  (selectedSeats.length >= MAX_SEATS_PER_BOOKING && !selectedSeats.includes(seat.seatid))
                 }
                 className={`
                   p-2 rounded-lg transition-colors relative
-                  ${seat.AvailabilityStatus === 'booked'
+                  ${seat.availabilitystatus === 'booked'
                     ? 'bg-red-500 cursor-not-allowed' 
                     : seat.temporarilyReserved
                       ? seat.reservedByMe
                         ? 'bg-green-500' // My reservation
                         : 'bg-yellow-400 cursor-not-allowed' // Someone else's reservation
-                      : selectedSeats.includes(seat.SeatID)
+                      : selectedSeats.includes(seat.seatid)
                         ? 'bg-green-500' 
                         : selectedSeats.length >= MAX_SEATS_PER_BOOKING
                           ? 'bg-white opacity-50 cursor-not-allowed'

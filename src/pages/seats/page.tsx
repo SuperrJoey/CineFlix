@@ -88,8 +88,6 @@ const Seats = () => {
   });
 
   const handleShowtimeClick = (screenId: number, showtimeId: number) => {
-    console.log("Showtime clicked:", { screenId, showtimeId });
-    
     // Route based on user role
     if (userRole === 'admin') {
       navigate(`/admin/booking/${screenId}/${showtimeId}`);

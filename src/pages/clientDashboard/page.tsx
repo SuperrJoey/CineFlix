@@ -91,11 +91,6 @@ const ClientDashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    console.log("ClientDashboard component mounted");
-    console.log("User role:", localStorage.getItem('user'));
-    console.log("Token:", localStorage.getItem('token'));
-    console.log("Username:", localStorage.getItem('Name'));
-    
     setIsVisible(true);
     
     // Update time every minute

@@ -24,18 +24,8 @@ const Login = () => {
         username,
         password
       });
-
-      console.log("🔍 Login response:", res.data);
       
       const { token, role, name, isAdmin, adminRole, permissions } = res.data;
-      
-      console.log("🔍 Storing in localStorage:");
-      console.log("- token:", token);
-      console.log("- role:", role);
-      console.log("- name:", name);
-      console.log("- isAdmin:", isAdmin);
-      console.log("- adminRole:", adminRole);
-      console.log("- permissions:", permissions);
       
       localStorage.setItem("token", token);
       localStorage.setItem("user", role);
@@ -46,15 +36,7 @@ const Login = () => {
         localStorage.setItem("permissions", JSON.stringify(permissions || []));
       }
 
-      console.log("🔍 After storing - localStorage contents:");
-      console.log("- user:", localStorage.getItem("user"));
-      console.log("- token:", localStorage.getItem("token"));
-      console.log("- Name:", localStorage.getItem("Name"));
-      console.log("- adminRole:", localStorage.getItem("adminRole"));
-      console.log("- permissions:", localStorage.getItem("permissions"));
-
       // Route based on whether user is admin or not
-      console.log("🔍 Navigating to:", isAdmin ? "/dashboard" : "/client-dashboard");
       navigate(isAdmin ? "/dashboard" : "/client-dashboard");
     } catch (error) {
       console.error("Login error:", error);

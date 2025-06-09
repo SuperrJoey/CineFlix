@@ -30,16 +30,19 @@ export const Movies = () => {
     useEffect(() => {
         const fetchMovies = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/movies");
-                console.log("Fetched movies:", response.data);
+                const response = await axios.get("http://localhost:5000/api/movies", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                });
                 setMovies(response.data);
             } catch (error) {
                 console.error("Error fetching movies:", error);
             }
-            setLoading(false);
         };
+
         fetchMovies();
-    }, [])
+    }, []);
 
     useEffect(() => {
         // Check if user is admin
@@ -51,7 +54,7 @@ export const Movies = () => {
     }, []);
 
     useEffect(() => {
-        console.log("Current movies state:", movies);
+        // Additional effect for state logging if needed
     }, [movies]);
 
     useEffect(() => {

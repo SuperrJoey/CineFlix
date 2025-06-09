@@ -18,7 +18,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, bookingDet
     const [show, setShow] = useState(false);
     const [animationClass, setAnimationClass] = useState('opacity-0 translate-y-10');
 
-    console.log("Booking details: ", bookingDetails);
+    // Booking modal component
     useEffect(() => {
         let animationTimeout: NodeJS.Timeout;
         

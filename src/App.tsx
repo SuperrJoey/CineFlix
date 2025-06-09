@@ -18,50 +18,23 @@ import BookingPage from './pages/BookingPage'
 import AdminBookingView from './pages/adminBookingView'
 
 // Protected route component
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requiredRole: 'admin' | 'user' | null;
-}
-
-const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode; requiredRole: 'admin' | 'user' }) => {
   const userRole = localStorage.getItem('user');
-  const token = localStorage.getItem('token');
   
-  console.log("🔐 ProtectedRoute check:");
-  console.log("- requiredRole:", requiredRole);
-  console.log("- userRole from localStorage:", userRole);
-  console.log("- token exists:", !!token);
-  
-  if (!token) {
-    console.log("❌ No token, redirecting to home");
-    return <Navigate to="/" replace />;
-  }
-  
-  // If no specific role is required, just check if user is authenticated
-  if (!requiredRole) {
-    console.log("✅ No specific role required, allowing access");
+  if (requiredRole === 'admin') {
+    const isAdmin = userRole === 'admin';
+    if (!isAdmin) {
+      return <Navigate to="/" replace />;
+    }
     return <>{children}</>;
   }
   
-  // For admin routes, check if user has admin role
-  if (requiredRole === 'admin') {
-    console.log("🔍 Admin route check - userRole:", userRole, "required: admin");
-    // Check if user role is admin (this covers admin, adminRole manager, etc.)
-    if (userRole !== 'admin') {
-      console.log("❌ User is not admin, redirecting to home");
-      return <Navigate to="/" replace />;
-    }
-    console.log("✅ Admin access granted");
-  }
-  
-  // For user routes, check if user has user role
   if (requiredRole === 'user') {
-    console.log("🔍 User route check - userRole:", userRole, "required: user");
-    if (userRole !== 'user') {
-      console.log("❌ User is not regular user, redirecting to home");
+    const isUser = userRole === 'user';
+    if (!isUser) {
       return <Navigate to="/" replace />;
     }
-    console.log("✅ User access granted");
+    return <>{children}</>;
   }
   
   return <>{children}</>;
@@ -82,15 +55,16 @@ const DefaultLayout = () => {
 
 function App() {
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   useEffect(() => {
-    const role = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-
-    console.log("from useEffect- ",localStorage.getItem('user'));
-    console.log("from useEffect - ", localStorage.getItem('token'));
-
-    setUserRole(role);
+    const user = localStorage.getItem('user');
+    
+    if (token && user) {
+      setIsLoggedIn(true);
+      setUserRole(user);
+    }
   }, []);
 
   return (

@@ -76,11 +76,10 @@ const BookingPage = () => {
 
     // Setup socket event listeners
     socket.on('connect', () => {
-      console.log('Connected to socket server with ID:', socket.id);
+      // Connected to socket server
     });
 
     socket.on('seat_temporarily_reserved', (data: SeatReservation) => {
-      console.log('Seat temporarily reserved:', data);
       setSeats(prev => prev.map(seat => {
         if (seat.seatid === data.seatId) {
           return {
@@ -94,7 +93,6 @@ const BookingPage = () => {
     });
 
     socket.on('seat_reservation_released', (data: SeatReservation) => {
-      console.log('Seat reservation released:', data);
       setSeats(prev => prev.map(seat => {
         if (seat.seatid === data.seatId) {
           return {
@@ -108,7 +106,6 @@ const BookingPage = () => {
     });
 
     socket.on('seat_reservation_expired', (data: SeatReservation) => {
-      console.log('Seat reservation expired:', data);
       setSeats(prev => prev.map(seat => {
         if (seat.seatid === data.seatId) {
           return {
@@ -127,7 +124,6 @@ const BookingPage = () => {
     });
 
     socket.on('seats_booked', (data: { seatIds: number[], socketId: string }) => {
-      console.log('Seats booked:', data);
       setSeats(prev => prev.map(seat => {
         if (data.seatIds.includes(seat.seatid)) {
           return {
@@ -147,7 +143,6 @@ const BookingPage = () => {
     });
 
     socket.on('booking_cancelled', (data: { seatIds: number[] }) => {
-      console.log('Booking cancelled, seats available again:', data);
       setSeats(prev => prev.map(seat => {
         if (data.seatIds.includes(seat.seatid)) {
           return {
@@ -325,7 +320,7 @@ const BookingPage = () => {
         }
       );
 
-      console.log("Booking response: ", response.data);
+      // Booking successful
 
       if (response.status === 201) {
         setBookingDetails({

@@ -1,8 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { format, addDays, isAfter, isBefore, parseISO } from 'date-fns';
-import PageWrapper from "../../components/pageWrapper";
+import { addDays, isAfter, isBefore, parseISO } from 'date-fns';
 
 interface Movie {
   title: string;
@@ -56,9 +55,6 @@ export const MovieDetails = () => {
   // Generate available screens (1-20)
   const availableScreens = Array.from({ length: 20 }, (_, i) => i + 1);
 
-  // Generate available dates (next 5 days)
-  const availableDates = Array.from({ length: 5 }, (_, i) => addDays(new Date(), i + 1));
-
   useEffect(() => {
     const checkAdminStatus = () => {
       const userRole = localStorage.getItem('user');
@@ -80,7 +76,7 @@ export const MovieDetails = () => {
         setError("Failed to load movie details");
       } finally {
         setLoading(false);
-        const timer = setTimeout(() => setShowContent(true), 500);
+        setTimeout(() => setShowContent(true), 500);
       }
     };
 

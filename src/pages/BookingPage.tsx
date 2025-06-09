@@ -27,12 +27,6 @@ interface Showtime {
   duration: number;
 }
 
-interface SeatSelectionUpdate {
-  seatId: number;
-  isSelected: boolean;
-  socketId: string;
-}
-
 interface SeatReservation {
   seatId: number;
   socketId: string;

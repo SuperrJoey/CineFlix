@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Film, Users, Clock, Sparkles, Ticket, Popcorn, Star, Calendar, CreditCard } from "lucide-react";
+import { Film, Clock, Sparkles, Ticket, Popcorn, Star, Calendar } from "lucide-react";
 import PageWrapper from "../../components/pageWrapper";
 
 const ClientDashboardCard = ({

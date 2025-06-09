@@ -54,16 +54,12 @@ const DefaultLayout = () => {
 }
 
 function App() {
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
   useEffect(() => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
     
     if (token && user) {
-      setIsLoggedIn(true);
-      setUserRole(user);
+      // Variables were being set but not used, so removed them
     }
   }, []);
 

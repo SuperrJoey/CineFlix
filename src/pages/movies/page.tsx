@@ -30,6 +30,7 @@ export const Movies = () => {
     useEffect(() => {
         const fetchMovies = async () => {
             try {
+                setLoading(true);
                 const response = await axios.get("http://localhost:5000/api/movies", {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -38,6 +39,8 @@ export const Movies = () => {
                 setMovies(response.data);
             } catch (error) {
                 console.error("Error fetching movies:", error);
+            } finally {
+                setLoading(false);
             }
         };
 

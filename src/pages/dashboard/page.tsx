@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Film, Users, UserCheck, BarChart3, Armchair, Clock, Sparkles } from "lucide-react";
+import { Film, Users, Clock, Sparkles } from "lucide-react";
 import PageWrapper from "../../components/pageWrapper";
 import Header from "../../components/Header";
 
@@ -72,12 +72,9 @@ const DashboardCard = ({
 const Dashboard = () => {
   const navigate = useNavigate();
   const username = localStorage.getItem("Name") || "Admin";
-  const [isVisible, setIsVisible] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    setIsVisible(true);
-    
     // Update time every minute
     const interval = setInterval(() => {
       setCurrentTime(new Date());

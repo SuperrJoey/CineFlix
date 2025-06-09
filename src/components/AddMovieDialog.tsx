@@ -47,6 +47,7 @@ export const AddMovieDialog = ({ isOpen, onClose, onSuccess }: AddMovieDialogPro
         }
       );
 
+      // Success - movie created
       onSuccess();
       onClose();
       setFormData({ title: '', genre: '', rating: '', duration: '' });

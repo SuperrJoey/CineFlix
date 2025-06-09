@@ -26,7 +26,7 @@ const Register = () => {
     try {
       const { fullName, username, password, role } = formData;
       
-      const response = await axios.post("http://localhost:5000/api/auth/signup", {
+      await axios.post("http://localhost:5000/api/auth/signup", {
         name: fullName,
         username,
         password,

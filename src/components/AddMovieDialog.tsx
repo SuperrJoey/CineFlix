@@ -32,7 +32,7 @@ export const AddMovieDialog = ({ isOpen, onClose, onSuccess }: AddMovieDialogPro
       }
 
       const response = await axios.post(
-        'http://localhost:5000/api/movies', 
+        'https://cineflix-be.onrender.com/api/movies', 
         {
           title: formData.title,
           genre: formData.genre,

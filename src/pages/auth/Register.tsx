@@ -26,7 +26,7 @@ const Register = () => {
     try {
       const { fullName, username, password, role } = formData;
       
-      await axios.post("http://localhost:5000/api/auth/signup", {
+      await axios.post("https://cineflix-be.onrender.com/api/auth/signup", {
         name: fullName,
         username,
         password,

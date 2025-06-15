@@ -52,13 +52,13 @@ const AdminBookingView = () => {
         // If we have a showtimeId, use it directly
         if (showtimeId) {
           // Fetch showtime details
-          const showtimeResponse = await axios.get(`http://localhost:5000/api/showtimes/${showtimeId}`);
+          const showtimeResponse = await axios.get(`https://cineflix-be.onrender.com/api/showtimes/${showtimeId}`);
           
           if (showtimeResponse.data) {
             setShowtime(showtimeResponse.data);
             
             // Then fetch seats for this showtime
-            const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${showtimeId}`);
+            const seatsResponse = await axios.get(`https://cineflix-be.onrender.com/api/seats/showtime/${showtimeId}`);
             const seatsData = seatsResponse.data;
             setSeats(seatsData);
             
@@ -81,7 +81,7 @@ const AdminBookingView = () => {
         // If we only have a screenId, we need to find the current showtime for this screen
         else if (screenId) {
           // First get all showtimes
-          const allShowtimesResponse = await axios.get(`http://localhost:5000/api/showtimes`);
+          const allShowtimesResponse = await axios.get(`https://cineflix-be.onrender.com/api/showtimes`);
           
           // Find the current showtime for this screen
           const currentTime = new Date();
@@ -97,7 +97,7 @@ const AdminBookingView = () => {
             setShowtime(currentShowtime);
             
             // Then fetch seats for this showtime
-            const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${currentShowtime.showtimeid}`);
+            const seatsResponse = await axios.get(`https://cineflix-be.onrender.com/api/seats/showtime/${currentShowtime.showtimeid}`);
             const seatsData = seatsResponse.data;
             setSeats(seatsData);
             

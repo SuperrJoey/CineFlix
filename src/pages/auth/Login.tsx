@@ -20,7 +20,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const { username, password } = formData;
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post("https://cineflix-be.onrender.com/api/auth/login", {
         username,
         password
       });

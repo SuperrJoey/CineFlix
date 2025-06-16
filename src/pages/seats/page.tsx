@@ -50,8 +50,8 @@ const Seats = () => {
       try {
         setLoading(true);
         const [moviesResponse, showtimesResponse] = await Promise.all([
-          axios.get('http://localhost:5000/api/movies'),
-          axios.get('http://localhost:5000/api/showtimes')
+          axios.get('https://cineflix-be.onrender.com/api/movies'),
+          axios.get('https://cineflix-be.onrender.com/api/showtimes')
         ]);
 
         setMovies(moviesResponse.data);

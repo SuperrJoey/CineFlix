@@ -64,7 +64,7 @@ export const ReportsDashboard: React.FC = () => {
         }
 
         // Fetch reports
-        const reportsResponse = await axios.get('http://localhost:5000/api/reports', {
+        const reportsResponse = await axios.get('https://cineflix-be.onrender.com/api/reports', {
           headers: { Authorization: `Bearer ${token}` },
           params: {
             startDate,
@@ -74,7 +74,7 @@ export const ReportsDashboard: React.FC = () => {
         });
 
         // Fetch summary
-        const summaryResponse = await axios.get('http://localhost:5000/api/reports/summary', {
+        const summaryResponse = await axios.get('https://cineflix-be.onrender.com/api/reports/summary', {
           headers: { Authorization: `Bearer ${token}` },
           params: { startDate, endDate }
         });

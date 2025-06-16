@@ -71,7 +71,7 @@ const Staff = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/staff', {
+      const response = await axios.get('https://cineflix-be.onrender.com/api/staff', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStaff(response.data);
@@ -91,7 +91,7 @@ const Staff = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/staff/${staffId}/schedules`, {
+      const response = await axios.get(`https://cineflix-be.onrender.com/api/staff/${staffId}/schedules`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSchedules(response.data);
@@ -194,7 +194,7 @@ const Staff = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/staff',
+        'https://cineflix-be.onrender.com/api/staff',
         newStaff,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -235,7 +235,7 @@ const Staff = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/staff/schedules',
+        'https://cineflix-be.onrender.com/api/staff/schedules',
         schedule,
         { headers: { Authorization: `Bearer ${token}` } }
       );

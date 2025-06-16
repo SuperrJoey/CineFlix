@@ -42,7 +42,7 @@ const Customer = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/api/customers', {
+        const response = await axios.get('https://cineflix-be.onrender.com/api/customers', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -63,7 +63,7 @@ const Customer = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await axios.get(`http://localhost:5000/api/customers/${customerId}`, {
+      const response = await axios.get(`https://cineflix-be.onrender.com/api/customers/${customerId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

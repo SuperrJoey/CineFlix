@@ -31,7 +31,7 @@ export const Movies = () => {
         const fetchMovies = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get("http://localhost:5000/api/movies", {
+                const response = await axios.get("https://cineflix-be.onrender.com/api/movies", {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
                     }

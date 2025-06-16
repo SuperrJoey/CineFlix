@@ -65,8 +65,8 @@ export const MovieDetails = () => {
       try {
         setLoading(true);
         const [movieRes, showtimeRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/movies/${id}`),
-          axios.get(`http://localhost:5000/api/showtimes/movie/${id}`),
+          axios.get(`https://cineflix-be.onrender.com/api/movies/${id}`),
+          axios.get(`https://cineflix-be.onrender.com/api/showtimes/movie/${id}`),
         ]);
 
         setMovie(movieRes.data);
@@ -113,7 +113,7 @@ export const MovieDetails = () => {
       }
 
       const response = await axios.post(
-        'http://localhost:5000/api/showtimes',
+        'https://cineflix-be.onrender.com/api/showtimes',
         {
           movieId: parseInt(id || '0'),
           screenId: parseInt(formData.screenId),
@@ -129,7 +129,7 @@ export const MovieDetails = () => {
 
       if (response.data) {
         // Refresh showtimes
-        const showtimeRes = await axios.get(`http://localhost:5000/api/showtimes/movie/${id}`);
+        const showtimeRes = await axios.get(`https://cineflix-be.onrender.com/api/showtimes/movie/${id}`);
         setShowtimes(showtimeRes.data);
         setShowAddForm(false);
         setFormData({

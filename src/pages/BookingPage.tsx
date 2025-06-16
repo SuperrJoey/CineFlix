@@ -159,13 +159,13 @@ const BookingPage = () => {
           socket.emit('join_showtime', showtimeId);
           
           // Fetch showtime details
-          const showtimeResponse = await axios.get(`http://localhost:5000/api/showtimes/${showtimeId}`);
+          const showtimeResponse = await axios.get(`https://cineflix-be.onrender.com/api/showtimes/${showtimeId}`);
           
           if (showtimeResponse.data) {
             setShowtime(showtimeResponse.data);
             
             // Then fetch seats for this showtime
-            const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${showtimeId}`);
+            const seatsResponse = await axios.get(`https://cineflix-be.onrender.com/api/seats/showtime/${showtimeId}`);
             
             // Process seat data to mark any temporarily reserved seats
             const processedSeats = seatsResponse.data.map((seat: Seat) => ({
@@ -181,7 +181,7 @@ const BookingPage = () => {
         // If we only have a screenId, we need to find the current showtime for this screen
         else if (screenId) {
           // First get all showtimes
-          const allShowtimesResponse = await axios.get(`http://localhost:5000/api/showtimes`);
+          const allShowtimesResponse = await axios.get(`https://cineflix-be.onrender.com/api/showtimes`);
           
           // Find the current showtime for this screen
           const currentTime = new Date();
@@ -200,7 +200,7 @@ const BookingPage = () => {
             socket.emit('join_showtime', currentShowtime.showtimeid);
             
             // Then fetch seats for this showtime
-            const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${currentShowtime.showtimeid}`);
+            const seatsResponse = await axios.get(`https://cineflix-be.onrender.com/api/seats/showtime/${currentShowtime.showtimeid}`);
             setSeats(seatsResponse.data);
           } else {
             setError("No active showtime found for this screen");
@@ -229,7 +229,7 @@ const BookingPage = () => {
   const refreshSeats = async () => {
     if (showtime) {
       try {
-        const seatsResponse = await axios.get(`http://localhost:5000/api/seats/showtime/${showtime.showtimeid}`);
+        const seatsResponse = await axios.get(`https://cineflix-be.onrender.com/api/seats/showtime/${showtime.showtimeid}`);
         setSeats(seatsResponse.data);
         setSelectedSeats([]); // Clear selection after booking
       } catch (error) {
@@ -260,7 +260,7 @@ const BookingPage = () => {
     
     try {
       // Send reservation request to server
-      const response = await axios.post(`http://localhost:5000/api/seats/showtime/${showtime.showtimeid}/reserve`, {
+      const response = await axios.post(`https://cineflix-be.onrender.com/api/seats/showtime/${showtime.showtimeid}/reserve`, {
         seatId,
         socketId: socketRef.current.id,
         isReserving: !isAlreadySelected
@@ -302,7 +302,7 @@ const BookingPage = () => {
       if (!token || !showtime || !socketRef.current) return;
 
       const response = await axios.post(
-        `http://localhost:5000/api/seats/showtime/${showtime.showtimeid}/book`,
+        `https://cineflix-be.onrender.com/api/seats/showtime/${showtime.showtimeid}/book`,
         { 
           seatIds: selectedSeats,
           socketId: socketRef.current.id
